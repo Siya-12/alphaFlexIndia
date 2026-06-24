@@ -1,7 +1,11 @@
+"use client";
+import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 
+
 export default function Navbar() {
+  const { data: session } = useSession();
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-6">
@@ -39,7 +43,7 @@ export default function Navbar() {
 
           </nav>
 
-          {/* CTA Buttons */}
+         {/* CTA Buttons */}
 
           <div className="hidden lg:flex gap-4">
 
@@ -59,6 +63,31 @@ export default function Navbar() {
               Download Catalogue
             </a>
 
+            {session ? (
+              <div className="flex gap-3">
+                <Link
+                  href="/profile"
+                  className="border px-4 py-2 rounded"
+                >
+                  {session.user?.name}
+                </Link>
+
+                <button
+                  onClick={() => signOut()}
+                  className="bg-red-500 text-white px-4 py-2 rounded"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="border px-4 py-2 rounded"
+              >
+                Login
+              </Link>
+            )}
+
             <button
               className="
               bg-blue-700
@@ -66,6 +95,8 @@ export default function Navbar() {
               px-5
               py-3
               rounded-lg
+              hover:bg-blue-800
+              transition
               "
             >
               Get Quote
