@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import FloatingProduct from "./FloatingProduct";
 import HeroBackground from "./HeroBackground";
 
 export default function Hero() {
@@ -9,7 +8,8 @@ export default function Hero() {
     <section
       className="
       relative
-      min-h-screen
+      min-h-[85vh]
+      py-10
       overflow-hidden
       bg-white
       flex
@@ -22,16 +22,18 @@ export default function Hero() {
         className="
         max-w-7xl
         mx-auto
-        px-6
+        px-4
+        sm:px-6
         lg:px-12
         w-full
         grid
+        grid-cols-1
         lg:grid-cols-2
-        gap-10
+        gap-12
         items-center
         "
       >
-        {/* LEFT */}
+        {/* LEFT SECTION */}
 
         <motion.div
           initial={{
@@ -45,7 +47,11 @@ export default function Hero() {
           transition={{
             duration: 1,
           }}
+          className="text-center lg:text-left"
         >
+
+          {/* Tagline */}
+
           <span
             className="
             inline-block
@@ -60,12 +66,16 @@ export default function Hero() {
             Premium Packaging Solutions
           </span>
 
+          {/* Heading */}
+
           <h1
             className="
             mt-6
-            text-5xl
+            text-4xl
+            sm:text-5xl
             lg:text-7xl
             font-bold
+            leading-tight
             text-slate-900
             "
           >
@@ -74,20 +84,40 @@ export default function Hero() {
             of Packaging
           </h1>
 
+          {/* Description */}
+
           <p
             className="
             mt-6
-            text-lg
+            text-base
+            sm:text-lg
             text-slate-600
             max-w-xl
+            mx-auto
+            lg:mx-0
             "
           >
             Alpha Flex India delivers innovative,
             reliable and sustainable packaging
             solutions for modern businesses.
+            We specialize in courier bags,
+            labels, shrink films and custom
+            packaging products.
           </p>
 
-          <div className="flex gap-4 mt-8 flex-wrap">
+          {/* CTA Buttons */}
+
+          <div
+            className="
+            flex
+            flex-col
+            sm:flex-row
+            gap-4
+            mt-8
+            justify-center
+            lg:justify-start
+            "
+          >
             <button
               className="
               bg-blue-700
@@ -95,6 +125,7 @@ export default function Hero() {
               px-6
               py-3
               rounded-xl
+              font-medium
               hover:scale-105
               transition
               "
@@ -110,7 +141,9 @@ export default function Hero() {
               px-6
               py-3
               rounded-xl
+              font-medium
               hover:bg-blue-50
+              transition
               "
             >
               Download Catalogue
@@ -118,30 +151,69 @@ export default function Hero() {
           </div>
         </motion.div>
 
-        {/* RIGHT */}
+        {/* RIGHT SECTION - VIDEO */}
 
-        <div className="relative h-[650px] hidden lg:block">
-          <FloatingProduct
-            src="/logos/Alpha.png"
-            alt="Poly Bag"
-            delay={0.4}
-            className="absolute left-0 top-40"
+        <motion.div
+          initial={{
+            opacity: 0,
+            x: 80,
+          }}
+          animate={{
+            opacity: 1,
+            x: 0,
+          }}
+          transition={{
+            duration: 1,
+            delay: 0.3,
+          }}
+          className="
+          relative
+          h-[280px]
+          sm:h-[350px]
+          md:h-[420px]
+          lg:h-[500px]
+          flex
+          items-center
+          justify-center
+          "
+        >
+          {/* Glow Effect */}
+
+          <div
+            className="
+            absolute
+            inset-0
+            bg-blue-500/10
+            blur-3xl
+            rounded-full
+            "
           />
 
-          <FloatingProduct
-           src="/logos/Alpha.png"
-            alt="Label Roll"
-            delay={0.8}
-            className="absolute right-10 top-10"
-          />
+          {/* Video */}
 
-          <FloatingProduct
-            src="/logos/Alpha.png"
-            alt="Shrink Film"
-            delay={1.2}
-            className="absolute right-0 bottom-20"
-          />
-        </div>
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="
+            relative
+            z-10
+            w-full
+            h-full
+            rounded-3xl
+            shadow-2xl
+            border
+            border-white/20
+            object-cover
+            "
+          >
+            <source
+              src="/videos/packaging.mp4"
+              type="video/mp4"
+            />
+          </video>
+        </motion.div>
       </div>
     </section>
   );

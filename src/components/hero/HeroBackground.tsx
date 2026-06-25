@@ -20,7 +20,7 @@ export default function HeroBackground() {
           w-[500px]
           h-[500px]
           rounded-full
-          bg-blue-200/30
+          bg-blue-800/30
           blur-3xl
         "
       />
@@ -40,7 +40,7 @@ export default function HeroBackground() {
           w-[400px]
           h-[400px]
           rounded-full
-          bg-cyan-200/30
+          bg-blue-400/30
           blur-3xl
         "
       />
