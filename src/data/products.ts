@@ -1,38 +1,26 @@
 export const products = [
   {
     id: 1,
-    title: "Poly Courier Bags",
+    title: "Tamper Proof Courier Bags",
     description: "Waterproof & Durable",
     image: "/products/CB1.png",
   },
   {
     id: 2,
-    title: "Paper Courier Bags",
+    title: "LDPE Shrink Films",
     description: "Eco Friendly Packaging",
     image: "/products/CB3.png",
   },
   {
     id: 3,
-    title: "Direct Thermal Labels",
+    title: "LDPE Lamination Films",
     description: "Fast & Reliable Printing",
-    image: "/products/thermal-label.jpg",
+    image: "/products/ldpe-lamin.png",
   },
   {
     id: 4,
-    title: "Chromo Labels",
-    description: "Premium Labeling Solutions",
-    image: "/products/chromo-label.jpg",
-  },
-  {
-    id: 5,
     title: "LDPE Pouches",
     description: "Flexible Packaging",
-    image: "/products/ldpe-pouch.jpg",
-  },
-  {
-    id: 6,
-    title: "Shrink Film",
-    description: "Secure Product Wrapping",
-    image: "/products/shrink-film.jpg",
+    image: "/products/ldpe-pouch.png",
   },
 ];

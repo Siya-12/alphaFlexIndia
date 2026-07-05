@@ -2,9 +2,24 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/* @custom-variant dark (&:is(.dark *)); */
 
 @theme inline {
+    --color-ink: #14141a;
+
+  --color-navy: #0e1b4d;
+  --color-navy-light: #1e2b66;
+
+  --color-indigo: #3d3fa1;
+  --color-indigo-light: #5b5dc9;
+  --color-indigo-dark: #2b2d7a;
+
+  --color-steel: #97a0ac;
+  --color-steel-light: #c7cdd6;
+  --color-steel-dark: #6b7280;
+
+  --color-surface: #f7f8fa;
+  --color-surface2: #eef0f3;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -127,4 +142,16 @@
   html {
     @apply font-sans;
   }
+}
+@keyframes clients-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-clients-scroll {
+  animation: clients-scroll 35s linear infinite;
 }

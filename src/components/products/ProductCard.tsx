@@ -32,7 +32,7 @@ export default function ProductCard({
       hover:shadow-2xl
       border
       border-transparent
-      hover:border-blue-500
+      hover:border-indigo
       transition-all
       duration-300
       "
@@ -45,7 +45,9 @@ export default function ProductCard({
           height={300}
           className="
           w-full
-          h-64
+          h-40
+          sm:h-56
+          lg:h-64
           object-cover
           group-hover:scale-110
           transition-transform
@@ -54,12 +56,13 @@ export default function ProductCard({
         />
       </div>
 
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <h3
           className="
-          text-xl
+          text-base
+          sm:text-xl
           font-bold
-          text-slate-900
+          text-ink
           "
         >
           {title}
@@ -67,8 +70,12 @@ export default function ProductCard({
 
         <p
           className="
-          text-slate-600
+          text-sm
+          sm:text-base
+          text-ink/60
           mt-2
+          line-clamp-2
+          sm:line-clamp-none
           "
         >
           {description}
@@ -77,8 +84,11 @@ export default function ProductCard({
         <button
           className="
           mt-4
-          text-blue-700
+          text-sm
+          sm:text-base
+          text-navy
           font-semibold
+          hover:text-indigo
           hover:translate-x-2
           transition
           "
