@@ -65,7 +65,7 @@ export default function GallerySection() {
   };
 
   return (
-    <section className="bg-white py-20 lg:py-28 overflow-hidden">
+    <section id="gallery" className="bg-white py-20 lg:py-28 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 24 }}

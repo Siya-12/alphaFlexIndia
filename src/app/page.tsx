@@ -7,6 +7,10 @@ import Gallery from "@/components/Gallery";
 import WhyUs from "@/components/WhyUs";
 import NoticeBoard from "@/components/NoticeBoard";
 
+export const metadata = {
+  title: "Home",
+};
+
 export default function Home() {
   return (
     <>
