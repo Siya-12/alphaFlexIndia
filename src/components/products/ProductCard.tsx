@@ -93,7 +93,7 @@ export default function ProductCard({
           transition
           "
         >
-          View Details →
+          {/* View Details → */}
         </button>
       </div>
     </motion.div>

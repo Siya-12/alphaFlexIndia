@@ -65,16 +65,7 @@ export default function OurMachines() {
             Narela, Delhi.
           </p>
         </div>
-      {/* <div className="mx-auto max-w-7xl px-6">
-        <div className="max-w-2xl">
-          <h2 className="text-3xl font-bold tracking-tight text-[#0E1B4D] sm:text-4xl">
-            Our <em className="italic text-amber-500">Machines</em>
-          </h2>
-          <p className="mt-3 text-base text-[#97A0AC] sm:text-lg">
-            State-of-the-art equipment installed at our manufacturing unit in
-            Narela, Delhi.
-          </p>
-        </div> */}
+    
 
         <div className="mt-12 grid grid-cols-2 gap-x-5 gap-y-10 sm:gap-x-6 sm:gap-y-12 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-14">
           {machines.map((machine) => (

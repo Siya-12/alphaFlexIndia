@@ -13,14 +13,40 @@ const galleryImages = [
   { src: "/images/gallery/4.jpg", alt: "Finished packaging" },
   { src: "/images/gallery/5.jpg", alt: "Warehouse dispatch" },
   { src: "/images/gallery/6.jpg", alt: "Lamination line" },
+  { src: "/images/gallery/7.jpeg", alt: "Courier bags" },
+  { src: "/images/gallery/8.jpeg", alt: "Film rolls" },
+   { src: "/images/gallery/9.webp", alt: "Quality control" },
+  { src: "/images/gallery/10.webp", alt: "Shrink film production" },
+  { src: "/images/gallery/11.webp", alt: "Finished packaging" },
+  { src: "/images/gallery/5.jpg", alt: "Warehouse dispatch" },
+  { src: "/images/gallery/12.webp", alt: "Lamination line" },
+  { src: "/images/gallery/13.webp", alt: "Courier bags" },
+  { src: "/images/gallery/14.webp", alt: "Film rolls" },
 ];
 
-const AUTOPLAY_MS = 3200;
+
+const AUTOPLAY_MS = 1000;
 
 export default function GallerySection() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(max-width: 640px)").matches;
+});
   const count = galleryImages.length;
+
+  // 7 visible on desktop (active + 3 each side), 5 visible on mobile (active + 2 each side)
+  const maxOffset = isMobile ? 2 : 3;
+
+ useEffect(() => {
+  const mq = window.matchMedia("(max-width: 640px)");
+  const handler = (e: MediaQueryListEvent) => {
+    setIsMobile(e.matches);
+  };
+  mq.addEventListener("change", handler);
+  return () => mq.removeEventListener("change", handler);
+}, []);
 
   const next = useCallback(() => setActive((i) => (i + 1) % count), [count]);
   const prev = useCallback(() => setActive((i) => (i - 1 + count) % count), [count]);
@@ -31,7 +57,6 @@ export default function GallerySection() {
     return () => clearInterval(timer);
   }, [paused, next]);
 
-  // signed distance from active, wrapped to the shorter direction (-count/2 .. count/2)
   const getOffset = (index: number) => {
     let diff = index - active;
     if (diff > count / 2) diff -= count;
@@ -49,11 +74,9 @@ export default function GallerySection() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center mb-14"
         >
-          <div className="inline-block text-sm font-medium text-navy bg-surface px-4 py-1.5 rounded-full border border-ink/5 mb-4">
-            Gallery
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-ink">
-            Inside <span className="italic font-serif text-indigo">Our Facility</span>
+        <h2 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+             <em className="not-italic text-[#051c4d]">Gallery</em>{" "}
+            
           </h2>
           <p className="text-ink/60 mt-3 max-w-xl mx-auto">
             A look at the machines, processes, and people behind every roll we produce.
@@ -62,7 +85,7 @@ export default function GallerySection() {
 
         {/* STAGE */}
         <div
-          className="relative h-[280px] sm:h-[360px] md:h-[420px] flex items-center justify-center"
+          className="relative h-[220px] sm:h-[320px] md:h-[400px] flex items-center justify-center"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
@@ -71,35 +94,36 @@ export default function GallerySection() {
             const isActive = offset === 0;
             const abs = Math.abs(offset);
 
-            // hide cards too far out of view (keeps DOM light + clean on mobile)
-            if (abs > 2) return null;
+            // only render cards within the visible window (7 desktop / 5 mobile)
+            if (abs > maxOffset) return null;
 
-            const size = isActive ? 1 : abs === 1 ? 0.78 : 0.6;
-            const xShift = offset * (isActive ? 0 : 130) + offset * abs * 18;
+            const size = isActive ? 1 : 1 - abs * 0.13;
+            const baseGap = isMobile ? 68 : 108;
+            const xShift = offset * baseGap;
 
             return (
               <motion.div
                 key={img.src}
                 className="absolute rounded-2xl overflow-hidden shadow-xl border border-ink/5 bg-surface cursor-pointer"
                 style={{
-                  width: "min(60vw, 300px)",
+                  width: "min(52vw, 260px)",
                   aspectRatio: "1 / 1",
                 }}
                 animate={{
                   x: xShift,
                   scale: size,
-                  opacity: abs > 2 ? 0 : 1 - abs * 0.28,
+                  opacity: 1,
                   zIndex: 10 - abs,
-                  rotate: isActive ? 0 : offset * 4,
+                  rotate: isActive ? 0 : offset * 3,
                 }}
-                transition={{ type: "spring", stiffness: 260, damping: 28 }}
+                transition={{ duration: 1, ease: "easeInOut" }}
                 onClick={() => setActive(index)}
               >
                 <Image
                   src={img.src}
                   alt={img.alt}
                   fill
-                  sizes="(max-width: 640px) 60vw, 300px"
+                  sizes="(max-width: 640px) 52vw, 260px"
                   className="object-cover"
                 />
                 {isActive && (

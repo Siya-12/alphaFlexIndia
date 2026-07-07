@@ -3,7 +3,9 @@ import ProductsSection from "@/components/products/ProductsSection";
 import ClientsSlider from "@/components/ClientsSlider";
 import ManufacturingProcess from "@/components/ManufacturingProcess";
 import OurMachines from "@/components/OurMachines";
-import Gallery from "@/components/gallery/Gallery";
+import Gallery from "@/components/Gallery";
+import WhyUs from "@/components/WhyUs";
+import NoticeBoard from "@/components/NoticeBoard";
 
 export default function Home() {
   return (
@@ -13,8 +15,10 @@ export default function Home() {
        <ClientsSlider />
       <ProductsSection />    
       <ManufacturingProcess/>
-      <OurMachines/>
       <Gallery/>
+      <WhyUs/>
+      <OurMachines/>
+      <NoticeBoard/>
     </>
   );
 }

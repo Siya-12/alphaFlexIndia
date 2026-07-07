@@ -94,14 +94,14 @@ const socialLinks = [
   },
   {
   label: "Email",
-  href: "mailto:info@alphaflexindia.com",
+  href: "https://mail.google.com/mail/?view=cm&fs=1&to=info@alphaflexindia.com",
   bg: "bg-white",
   icon: <SiGmail size={24} className="text-red-500" />,
 },
   
 {
   label: "LinkedIn",
-  href: "https://www.linkedin.com",
+  href: "https://www.linkedin.com/in/vishard-bansal-b09191248/",
   bg: "bg-[#0A66C2] border-gray-200",
   icon: <FaLinkedin size={20} color="white" />,
 },
