@@ -21,22 +21,22 @@ export default function ClientsSlider() {
   const loopedLogos = [...clientLogos, ...clientLogos];
 
   return (
-    <section id="clients" className="py-14 pb-2 bg-surface border-t border-surface2">
+    <section id="clients" className="py-14 pb-2 bg- border-t border-surface2 bg-[#0B1730]">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
-          <div className="inline-block text-sm font-medium text-navy bg-white px-4 py-1.5 rounded-full border border-ink/5 mb-4">
-            Our Clients
-          </div>
-          <h2 className="text-3xl font-bold text-navy">
-            Trusted by <em className="font-serif italic text-indigo not-italic-fallback">Industry Leaders</em>
+          <span className="inline-block rounded-full border border-[#4C5FE0]/40 bg-[#4C5FE0]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#9AA6F5]">
+            Trusted by Industry Leaders
+          </span>
+            <h2 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+            Our <em className="not-italic text-[#4C5FE0]">Clients</em>{" "}
           </h2>
-          <p className="text-ink/60 mt-3 max-w-2xl mx-auto">
+          <p className="text-[#B7C0CC] mt-3 max-w-2xl mx-auto">
             Alpha Flex India proudly manufactures solutions trusted by leading brands in FMCG, Retail,
             Fashion, Personal Care, Food, Pharmaceuticals, and Consumer Goods across India.
           </p>
         </div>
 
-        <div className="overflow-hidden w-full">
+        <div className="overflow-hidden w-full bg-white">
           <div className="flex items-center w-max animate-clients-scroll hover:[animation-play-state:paused]">
             {loopedLogos.map((logo, i) => (
               <div
