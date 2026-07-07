@@ -1,9 +1,8 @@
 import Hero from "@/components/hero/Hero";
-// import Navbar from "@/components/navbar/Navbar";
 import ProductsSection from "@/components/products/ProductsSection";
 import ClientsSlider from "@/components/ClientsSlider";
 import ManufacturingProcess from "@/components/ManufacturingProcess";
-
+import OurMachines from "@/components/OurMachines";
 
 export default function Home() {
   return (
@@ -13,6 +12,7 @@ export default function Home() {
        <ClientsSlider />
       <ProductsSection />
       <ManufacturingProcess/>
+      <OurMachines/>
     </>
   );
 }
