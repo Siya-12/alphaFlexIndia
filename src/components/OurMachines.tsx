@@ -53,7 +53,7 @@ const machines: Machine[] = [
 
 export default function OurMachines() {
   return (
-    <section className="bg-[#F7F8FA] py-20 sm:py-28">
+    <section  id="machines" className="bg-[#F7F8FA] py-20 sm:py-28">
        <div className="relative mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">

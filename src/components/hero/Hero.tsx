@@ -163,7 +163,7 @@ export default function Hero() {
             <motion.a
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.97 }}
-              href="/pdfs/catalogue.pdf"
+              href="/catalogue/catalogue.pdf"
               className="px-7 py-3.5 rounded-full bg-navy text-white font-semibold hover:bg-indigo transition-colors inline-flex items-center gap-2"
             >
               Download Catalogue →

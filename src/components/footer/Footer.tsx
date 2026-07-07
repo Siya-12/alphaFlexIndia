@@ -21,7 +21,7 @@ const item: Variants = {
 const quickLinks = [
   { label: "Home", href: "/#home" },
   { label: "Products", href: "/#products" },
-  { label: "Industries", href: "/#industries" },
+  { label: "Machines", href: "/#machines" },
   { label: "Why Choose Us", href: "/#why" },
   { label: "Manufacturing Process", href: "/#process" },
   { label: "Our Clients", href: "/#clients" },
@@ -34,7 +34,7 @@ const productLinks = [
   { label: "Tamper Proof Courier Bags", href: "/#products" },
   { label: "LDPE Pouches", href: "/#products" },
   { label: "Custom Printed Packaging", href: "/#products" },
-  { label: "Request Catalogue", href: "/#contact" },
+  { label: "Request Catalogue", href: "/catalogue/catalogue.pdf" },
 ];
 
 const contactItems = [
@@ -84,7 +84,7 @@ const socialLinks = [
     
   {
     label: "LinkedIn",
-    href: "https://www.linkedin.com",
+    href: "https://www.linkedin.com/in/vishard-bansal-b09191248/",
     bg: "bg-[#0A66C2] border-gray-200",
     icon: <FaLinkedin size={20} color="white" />,
   },
@@ -193,7 +193,7 @@ export default function Footer() {
           className="flex flex-col items-center gap-5 md:flex-row md:items-center md:justify-between mb-8"
         >
           <div className="inline-flex bg-gray-200 rounded-lg p-2 shrink-0">
-            <Link href="#home" className="flex items-center">
+            <Link href="/#home" className="flex items-center">
               <Image
                 src="/images/Alpha.png"
                 alt="Alpha Flex India"

@@ -6,11 +6,11 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { label: "Products", href: "#products" },
-  { label: "Machines", href: "#industries" },
-  { label: "Why Us", href: "#why" },
-  { label: "Process", href: "#process" },
-  { label: "Clients", href: "#clients" },
+  { label: "Products", href: "/#products" },
+  { label: "Machines", href: "/#machines" },
+  { label: "Why Us", href: "/#why" },
+  { label: "Process", href: "/#process" },
+  { label: "Clients", href: "/#clients" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -25,15 +25,19 @@ export default function Navbar() {
       className="sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-ink/5"
     >
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link href="#home" className="flex items-center gap-2">
+        <Link href="/#home" className="flex items-center gap-2">
           <Image src="/images/Alpha.png" alt="Alpha Flex India" width={140} height={40} priority />
         </Link>
 
         <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-ink/80">
           {navLinks.map((link) => (
-            <a key={link.label} href={link.href} className="hover:text-indigo transition-colors">
-              {link.label}
-            </a>
+            <Link
+            key={link.label}
+            href={link.href}
+            className="hover:text-indigo transition-colors"
+          >
+            {link.label}
+          </Link>
           ))}
         </div>
 
@@ -47,7 +51,7 @@ export default function Navbar() {
           <motion.a
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
-            href="https://wa.me/917289009229?text=Hello%20Alpha%20Flex%20India,%20I%20would%20like%20to%20get%20a%20quote%20for%20your%20products."
+            href="/catalogue/catalogue.pdf"
             target="_blank"
             rel="noopener noreferrer"
             className="px-6 py-2.5 rounded-full bg-navy text-white text-sm font-semibold hover:bg-indigo transition-colors"
