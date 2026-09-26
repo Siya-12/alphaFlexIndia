@@ -1,0 +1,326 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model address {
+  id           String       @id
+  userId       String
+  type         address_type @default(HOME)
+  phone        String
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  postalCode   String
+  country      String       @default("India")
+  isDefault    Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime
+  firstName    String
+  lastName     String?
+  user         user         @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Address_userId_fkey")
+  order        order[]
+
+  @@index([userId], map: "Address_userId_idx")
+}
+
+model cart {
+  id        String     @id
+  userId    String     @unique(map: "Cart_userId_key")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime
+  user      user       @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Cart_userId_fkey")
+  cartitem  cartitem[]
+}
+
+model cartitem {
+  id             String         @id
+  cartId         String
+  variantId      String
+  quantity       Int
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime
+  cart           cart           @relation(fields: [cartId], references: [id], onDelete: Cascade, map: "CartItem_cartId_fkey")
+  productvariant productvariant @relation(fields: [variantId], references: [id], map: "CartItem_variantId_fkey")
+
+  @@unique([cartId, variantId], map: "CartItem_cartId_variantId_key")
+  @@index([variantId], map: "CartItem_variantId_idx")
+}
+
+model category {
+  id          String    @id
+  name        String    @unique(map: "Category_name_key")
+  slug        String    @unique(map: "Category_slug_key")
+  description String?   @db.Text
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+  product     product[]
+
+  @@index([isActive], map: "Category_isActive_idx")
+}
+
+model inventory {
+  id             String         @id
+  variantId      String         @unique(map: "Inventory_variantId_key")
+  quantity       Int            @default(0)
+  reserved       Int            @default(0)
+  lowStockAt     Int            @default(10)
+  updatedAt      DateTime
+  productvariant productvariant @relation(fields: [variantId], references: [id], onDelete: Cascade, map: "Inventory_variantId_fkey")
+
+  @@index([quantity], map: "Inventory_quantity_idx")
+}
+
+model order {
+  id                 String               @id
+  orderNumber        String               @unique(map: "Order_orderNumber_key")
+  userId             String
+  addressId          String?
+  status             order_status         @default(PENDING)
+  subtotal           Decimal              @db.Decimal(10, 2)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  customerNote       String?              @db.Text
+  discount           Decimal              @default(0.00) @db.Decimal(10, 2)
+  shippingFee        Decimal              @default(0.00) @db.Decimal(10, 2)
+  tax                Decimal              @default(0.00) @db.Decimal(10, 2)
+  total              Decimal              @db.Decimal(10, 2)
+  address            address?             @relation(fields: [addressId], references: [id], map: "Order_addressId_fkey")
+  user               user                 @relation(fields: [userId], references: [id], map: "Order_userId_fkey")
+  orderitem          orderitem[]
+  orderstatushistory orderstatushistory[]
+  payment            payment?
+  shipment           shipment?
+
+  @@index([addressId], map: "Order_addressId_idx")
+  @@index([createdAt], map: "Order_createdAt_idx")
+  @@index([status], map: "Order_status_idx")
+  @@index([userId], map: "Order_userId_idx")
+}
+
+model orderitem {
+  id             String         @id
+  orderId        String
+  variantId      String
+  productName    String
+  variantName    String
+  sku            String
+  unitPrice      Decimal        @db.Decimal(10, 2)
+  quantity       Int
+  totalPrice     Decimal        @db.Decimal(10, 2)
+  createdAt      DateTime       @default(now())
+  order          order          @relation(fields: [orderId], references: [id], onDelete: Cascade, map: "OrderItem_orderId_fkey")
+  productvariant productvariant @relation(fields: [variantId], references: [id], map: "OrderItem_variantId_fkey")
+
+  @@index([orderId], map: "OrderItem_orderId_idx")
+  @@index([variantId], map: "OrderItem_variantId_idx")
+}
+
+model orderstatushistory {
+  id        String                    @id
+  orderId   String
+  status    orderstatushistory_status
+  createdAt DateTime                  @default(now())
+  note      String?                   @db.Text
+  order     order                     @relation(fields: [orderId], references: [id], onDelete: Cascade, map: "OrderStatusHistory_orderId_fkey")
+
+  @@index([createdAt], map: "OrderStatusHistory_createdAt_idx")
+  @@index([orderId], map: "OrderStatusHistory_orderId_idx")
+}
+
+model payment {
+  id                String         @id
+  orderId           String         @unique(map: "Payment_orderId_key")
+  method            payment_method
+  status            payment_status @default(CREATED)
+  amount            Decimal        @db.Decimal(10, 2)
+  razorpayOrderId   String?        @unique(map: "Payment_razorpayOrderId_key")
+  razorpayPaymentId String?        @unique(map: "Payment_razorpayPaymentId_key")
+  razorpaySignature String?        @db.Text
+  paidAt            DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime
+  order             order          @relation(fields: [orderId], references: [id], onDelete: Cascade, map: "Payment_orderId_fkey")
+
+  @@index([method], map: "Payment_method_idx")
+  @@index([status], map: "Payment_status_idx")
+}
+
+model product {
+  id           String         @id
+  name         String
+  slug         String         @unique(map: "Product_slug_key")
+  description  String?        @db.Text
+  status       product_status @default(DRAFT)
+  categoryId   String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  category     category       @relation(fields: [categoryId], references: [id], map: "Product_categoryId_fkey")
+  productimage productimage[]
+
+  @@index([categoryId], map: "Product_categoryId_idx")
+  @@index([createdAt], map: "Product_createdAt_idx")
+  @@index([status], map: "Product_status_idx")
+}
+
+model productimage {
+  id        String   @id
+  productId String
+  url       String   @db.Text
+  altText   String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  product   product  @relation(fields: [productId], references: [id], onDelete: Cascade, map: "ProductImage_productId_fkey")
+
+  @@index([productId], map: "ProductImage_productId_idx")
+}
+
+model productvariant {
+  id           String      @id
+  productId    String
+  size         String?
+  sku          String      @unique(map: "ProductVariant_sku_key")
+  price        Decimal     @db.Decimal(10, 2)
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime
+  comparePrice Decimal?    @db.Decimal(10, 2)
+  name         String
+  unit         String?
+  cartitem     cartitem[]
+  inventory    inventory?
+  orderitem    orderitem[]
+
+  @@index([isActive], map: "ProductVariant_isActive_idx")
+  @@index([productId], map: "ProductVariant_productId_idx")
+  @@index([size], map: "ProductVariant_size_idx")
+}
+
+model shipment {
+  id             String          @id
+  orderId        String          @unique(map: "Shipment_orderId_key")
+  status         shipment_status @default(NOT_SHIPPED)
+  trackingNumber String?         @unique(map: "Shipment_trackingNumber_key")
+  trackingUrl    String?         @db.Text
+  shippedAt      DateTime?
+  deliveredAt    DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime
+  courierName    String?
+  order          order           @relation(fields: [orderId], references: [id], onDelete: Cascade, map: "Shipment_orderId_fkey")
+  trackingevent  trackingevent[]
+
+  @@index([status], map: "Shipment_status_idx")
+}
+
+model trackingevent {
+  id          String               @id
+  shipmentId  String
+  status      trackingevent_status
+  location    String?
+  description String?              @db.Text
+  eventTime   DateTime
+  createdAt   DateTime             @default(now())
+  shipment    shipment             @relation(fields: [shipmentId], references: [id], onDelete: Cascade, map: "TrackingEvent_shipmentId_fkey")
+
+  @@index([eventTime], map: "TrackingEvent_eventTime_idx")
+  @@index([shipmentId], map: "TrackingEvent_shipmentId_idx")
+}
+
+model user {
+  id        String    @id
+  email     String    @unique(map: "User_email_key")
+  phone     String?
+  role      user_role @default(CUSTOMER)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime
+  firstName String
+  lastName  String?
+  password  String
+  address   address[]
+  cart      cart?
+  order     order[]
+
+  @@index([createdAt], map: "User_createdAt_idx")
+  @@index([role], map: "User_role_idx")
+}
+
+enum address_type {
+  HOME
+  WORK
+  OTHER
+}
+
+enum orderstatushistory_status {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum payment_method {
+  RAZORPAY
+  COD
+}
+
+enum shipment_status {
+  NOT_SHIPPED
+  READY_TO_SHIP
+  SHIPPED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  RETURNED
+}
+
+enum trackingevent_status {
+  NOT_SHIPPED
+  READY_TO_SHIP
+  SHIPPED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  RETURNED
+}
+
+enum payment_status {
+  CREATED
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum user_role {
+  CUSTOMER
+  ADMIN
+}
+
+enum order_status {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum product_status {
+  DRAFT
+  ACTIVE
+  INACTIVE
+  OUT_OF_STOCK
+}
