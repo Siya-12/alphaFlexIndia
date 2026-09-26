@@ -1,0 +1,28 @@
+export const APP_NAME = "Alpha Flex India";
+
+export const API_VERSION = "v1";
+
+export const ORDER_STATUS = {
+  PENDING: "PENDING",
+  CONFIRMED: "CONFIRMED",
+  PROCESSING: "PROCESSING",
+  PACKED: "PACKED",
+  SHIPPED: "SHIPPED",
+  OUT_FOR_DELIVERY: "OUT_FOR_DELIVERY",
+  DELIVERED: "DELIVERED",
+  CANCELLED: "CANCELLED",
+  REFUNDED: "REFUNDED",
+} as const;
+
+export const PAYMENT_STATUS = {
+  PENDING: "PENDING",
+  AUTHORIZED: "AUTHORIZED",
+  CAPTURED: "CAPTURED",
+  FAILED: "FAILED",
+  REFUNDED: "REFUNDED",
+} as const;
+
+export const USER_ROLE = {
+  CUSTOMER: "CUSTOMER",
+  ADMIN: "ADMIN",
+} as const;
