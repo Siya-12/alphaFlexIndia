@@ -153,16 +153,17 @@ model payment {
 }
 
 model product {
-  id           String         @id
-  name         String
-  slug         String         @unique(map: "Product_slug_key")
-  description  String?        @db.Text
-  status       product_status @default(DRAFT)
-  categoryId   String
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime
-  category     category       @relation(fields: [categoryId], references: [id], map: "Product_categoryId_fkey")
-  productimage productimage[]
+  id             String           @id
+  name           String
+  slug           String           @unique(map: "Product_slug_key")
+  description    String?          @db.Text
+  status         product_status   @default(DRAFT)
+  categoryId     String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  category       category         @relation(fields: [categoryId], references: [id], map: "Product_categoryId_fkey")
+  productimage   productimage[]
+  productvariant productvariant[]
 
   @@index([categoryId], map: "Product_categoryId_idx")
   @@index([createdAt], map: "Product_createdAt_idx")
@@ -196,6 +197,7 @@ model productvariant {
   cartitem     cartitem[]
   inventory    inventory?
   orderitem    orderitem[]
+  product      product     @relation(fields: [productId], references: [id], onDelete: Cascade, map: "ProductVariant_productId_fkey")
 
   @@index([isActive], map: "ProductVariant_isActive_idx")
   @@index([productId], map: "ProductVariant_productId_idx")
