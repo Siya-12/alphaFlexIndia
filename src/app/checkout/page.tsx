@@ -222,7 +222,7 @@ export default function CheckoutPage() {
           contact: phone.trim(),
         },
         theme: { color: "#315cff" },
-        handler: async function (response: any) {
+        handler: async function (response) {
           try {
             const verifyResponse = await fetch("/api/checkout/verify", {
               method: "POST",
