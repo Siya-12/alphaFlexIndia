@@ -58,26 +58,34 @@ export async function GET(
           },
         },
 
-        productvariant: {
-          where: {
-            isActive: true,
-          },
+       productvariant: {
+  where: {
+    isActive: true,
+  },
 
-          orderBy: {
-            price: "asc",
-          },
+  orderBy: {
+    price: "asc",
+  },
 
-          select: {
-            id: true,
-            name: true,
-            size: true,
-            unit: true,
-            sku: true,
-            price: true,
-            comparePrice: true,
-          },
-        },
+  select: {
+    id: true,
+    name: true,
+    size: true,
+    unit: true,
+    sku: true,
+    price: true,
+    comparePrice: true,
+
+    inventory: {
+      select: {
+        quantity: true,
+        reserved: true,
+        lowStockAt: true,
       },
+    },
+  },
+},
+},
     });
 
     if (!product) {

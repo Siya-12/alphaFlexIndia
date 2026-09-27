@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/Footer";
 import FloatingWhatsApp from "@/components/FloatingWhatsapp";
-
+import Providers from "./providers";
 
 
 export const metadata: Metadata = {
@@ -95,10 +95,12 @@ export default function RootLayout({
     <html
       lang="en">
       <body>
+       < Providers>
             <Navbar />
            {children}
              <FloatingWhatsApp />
-            <Footer />      
+            <Footer />   
+            </Providers>   
       </body>
      </html>
    );
