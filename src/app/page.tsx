@@ -1,4 +1,4 @@
-import Hero from "@/components/hero/Hero";
+import Hero, { BrandedProductsCards } from "@/components/hero/Hero";
 import ProductsSection from "@/components/products/ProductsSection";
 import ClientsSlider from "@/components/ClientsSlider";
 import ManufacturingProcess from "@/components/ManufacturingProcess";
@@ -18,6 +18,8 @@ export default function Home() {
       <Hero />
        <ClientsSlider />
       <ProductsSection />    
+      <BrandedProductsCards />
+
       <ManufacturingProcess/>
       <Gallery/>
       <WhyUs/>
