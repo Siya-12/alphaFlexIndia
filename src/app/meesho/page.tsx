@@ -1,7 +1,37 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
+type Product = {
+  name: string;
+  productvariant?: ProductVariant[];
+};
 
+type ProductVariant = {
+  size?: string | null;
+};
+
+type GuestCartItem = {
+  variantId: string;
+  quantity: number;
+
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+    image: string;
+  };
+
+  variant: {
+    id: string;
+    name: string;
+    sku: string;
+    price: number;
+   size: string | null;
+    unit: string | null;
+    comparePrice: number | null;
+  };
+};
 const quantityOptions = [
   25,
   100,
@@ -32,8 +62,10 @@ const sizeOptions = [
 ];
 
 export default function MeeshoProductPage() {
+const router = useRouter();
   const [quantity, setQuantity] = useState(500);
   const [selectedSize, setSelectedSize] = useState("6.5 × 8");
+  const { status } = useSession();
 
   const selectedSizeData = useMemo(() => {
     return (
@@ -65,121 +97,97 @@ export default function MeeshoProductPage() {
 
  const handleAddToCart = async () => {
   try {
-    // Get all active products matching "Meesho"
-    const response = await fetch(
-      "/api/products?search=Meesho",
-      {
-        method: "GET",
-        cache: "no-store",
-      }
-    );
+    if (status === "loading") {
+      return;
+    }
+
+    const response = await fetch("/api/products?search=Meesho", {
+      method: "GET",
+      cache: "no-store",
+    });
 
     const result = await response.json();
 
     if (!response.ok || !result.success) {
-      throw new Error(
-        result.message || "Failed to find Meesho product"
-      );
+      throw new Error(result.message || "Failed to find Meesho product");
     }
 
-    // Find the Meesho product
-    const product = result.data?.find(
-      (item: any) =>
-        item.name
-          ?.toLowerCase()
-          .includes("meesho")
+    const product = result.data?.find((item: Product) =>
+      item.name?.toLowerCase().includes("meesho")
     );
 
     if (!product) {
-      throw new Error(
-        "Meesho product was not found in the database."
-      );
+      throw new Error("Meesho product was not found in the database.");
     }
 
-    // Find the selected size variant
     const variant = product.productvariant?.find(
-      (item: any) =>
-        item.size?.trim() === selectedSize.trim()
+      (item: ProductVariant) => item.size?.trim() === selectedSize.trim()
     );
 
     if (!variant) {
-      throw new Error(
-        `Variant for size ${selectedSize} was not found.`
-      );
+      throw new Error(`Variant for size ${selectedSize} was not found.`);
     }
 
-    // Existing guest cart
-    const storedCart =
-      localStorage.getItem("guestCart");
-
-    const guestCart = storedCart
-      ? JSON.parse(storedCart)
-      : [];
-
-    // Check if this exact variant is already in cart
-    const existingItemIndex =
-      guestCart.findIndex(
-        (item: any) =>
-          item.variantId === variant.id
-      );
-
-    if (existingItemIndex !== -1) {
-      // Add quantity to existing item
-      guestCart[existingItemIndex].quantity +=
-        quantity;
-    } else {
-      // Add new product variant
-      guestCart.push({
-        variantId: variant.id,
-
-        quantity,
-
-        product: {
-          id: product.id,
-          name: product.name,
-          slug: product.slug,
-          image:
-            product.productimage?.[0]?.url ??
-            "/images/meesho-product.png",
-        },
-
-        variant: {
-          id: variant.id,
-          name: variant.name,
-          size: variant.size,
-          unit: variant.unit,
-          sku: variant.sku,
-          price: Number(variant.price),
-          comparePrice:
-            variant.comparePrice !== null
-              ? Number(variant.comparePrice)
-              : null,
-        },
+    if (status === "authenticated") {
+      // Logged in: save straight to the database cart
+      const addResponse = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ variantId: variant.id, quantity }),
       });
+
+      const addResult = await addResponse.json();
+
+      if (!addResponse.ok || !addResult.success) {
+        throw new Error(addResult.message || "Failed to add product to cart");
+      }
+    } else {
+      // Guest: keep in localStorage until login
+      const storedCart = localStorage.getItem("guestCart");
+      const guestCart: GuestCartItem[] = storedCart ? JSON.parse(storedCart) : [];
+
+      const existingItemIndex = guestCart.findIndex(
+        (item) => item.variantId === variant.id
+      );
+
+      if (existingItemIndex !== -1) {
+        guestCart[existingItemIndex].quantity += quantity;
+      } else {
+        guestCart.push({
+          variantId: variant.id,
+          quantity,
+          product: {
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            image: product.productimage?.[0]?.url ?? "/images/meesho-product.png",
+          },
+          variant: {
+            id: variant.id,
+            name: variant.name,
+            size: variant.size,
+            unit: variant.unit,
+            sku: variant.sku,
+            price: Number(variant.price),
+            comparePrice:
+              variant.comparePrice !== null ? Number(variant.comparePrice) : null,
+          },
+        });
+      }
+
+      localStorage.setItem("guestCart", JSON.stringify(guestCart));
     }
 
-    // Save updated cart
-    localStorage.setItem(
-      "guestCart",
-      JSON.stringify(guestCart)
-    );
-
-    // Go to cart
-    window.location.href = "/cart";
-
+    window.dispatchEvent(new Event("cart-updated"));
+    router.push("/cart");
   } catch (error) {
-    console.error(
-      "Add to cart error:",
-      error
-    );
-
-    alert(
-      error instanceof Error
-        ? error.message
-        : "Unable to add product to cart."
-    );
+    console.error("Add to cart error:", error);
+    alert(error instanceof Error ? error.message : "Unable to add product to cart.");
   }
 };
+
+
+
   return (
     <main
       className="min-h-screen bg-white"

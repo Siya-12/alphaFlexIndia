@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
+import { useCartCount } from "@/hooks/useCartCount";
 
 const navLinks = [
   { label: "Products", href: "/#products" },
@@ -111,10 +112,11 @@ export default function Navbar() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
 
-  /* CART COUNT */
-  const [cartCount, setCartCount] = useState(0);
+  /* CART COUNT (database cart when logged in, guest cart otherwise) */
+  const cartCount = useCartCount();
 
-  const accountRef = useRef<HTMLDivElement>(null);
+  const desktopAccountRef = useRef<HTMLDivElement>(null);
+const mobileAccountRef = useRef<HTMLDivElement>(null);
 
   const { data: session, status } = useSession();
 
@@ -129,67 +131,6 @@ export default function Navbar() {
   const userInitial = userName.charAt(0).toUpperCase();
 
   /* -----------------------------
-     READ CART COUNT
-  ----------------------------- */
-  function updateCartCount() {
-    try {
-      const storedCart = localStorage.getItem("guestCart");
-
-      if (!storedCart) {
-        setCartCount(0);
-        return;
-      }
-
-      const cart = JSON.parse(storedCart);
-
-      if (!Array.isArray(cart)) {
-        setCartCount(0);
-        return;
-      }
-
-      const totalQuantity = cart.reduce(
-        (total: number, item: any) => {
-          return total + Number(item.quantity || 0);
-        },
-        0
-      );
-
-      setCartCount(totalQuantity);
-    } catch (error) {
-      console.error("Failed to read cart count:", error);
-      setCartCount(0);
-    }
-  }
-
-  /* -----------------------------
-     CART COUNT LISTENER
-  ----------------------------- */
-  useEffect(() => {
-    updateCartCount();
-
-    const handleCartUpdate = () => {
-      updateCartCount();
-    };
-
-    window.addEventListener("storage", handleCartUpdate);
-    window.addEventListener("cartUpdated", handleCartUpdate);
-
-    /*
-      Small interval so the navbar also notices
-      cart changes made in the same browser tab.
-    */
-    const interval = setInterval(() => {
-      updateCartCount();
-    }, 500);
-
-    return () => {
-      window.removeEventListener("storage", handleCartUpdate);
-      window.removeEventListener("cartUpdated", handleCartUpdate);
-      clearInterval(interval);
-    };
-  }, []);
-
-  /* -----------------------------
      SHOW HELLO MESSAGE AFTER LOGIN
   ----------------------------- */
   useEffect(() => {
@@ -197,21 +138,25 @@ export default function Navbar() {
       return;
     }
 
-    const welcomeKey = `alpha-welcome-${
-      session.user.email || userName
-    }`;
+    const welcomeKey = `alpha-welcome-${session.user.email || userName}`;
 
     const alreadyShown = sessionStorage.getItem(welcomeKey);
 
     if (!alreadyShown) {
-      setShowWelcome(true);
       sessionStorage.setItem(welcomeKey, "true");
 
-      const timer = setTimeout(() => {
+      const showTimer = setTimeout(() => {
+        setShowWelcome(true);
+      }, 0);
+
+      const hideTimer = setTimeout(() => {
         setShowWelcome(false);
       }, 5000);
 
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
     }
   }, [status, session, userName]);
 
@@ -219,30 +164,26 @@ export default function Navbar() {
      CLOSE ACCOUNT DROPDOWN
      WHEN CLICKING OUTSIDE
   ----------------------------- */
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        accountRef.current &&
-        !accountRef.current.contains(event.target as Node)
-      ) {
-        setAccountOpen(false);
-      }
-    }
+ useEffect(() => {
+  function handleClickOutside(event: MouseEvent) {
+    const target = event.target as Node;
 
-    if (accountOpen) {
-      document.addEventListener(
-        "mousedown",
-        handleClickOutside
-      );
-    }
+    const insideDesktop = desktopAccountRef.current?.contains(target);
+    const insideMobile = mobileAccountRef.current?.contains(target);
 
-    return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside
-      );
-    };
-  }, [accountOpen]);
+    if (!insideDesktop && !insideMobile) {
+      setAccountOpen(false);
+    }
+  }
+
+  if (accountOpen) {
+    document.addEventListener("mousedown", handleClickOutside);
+  }
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, [accountOpen]);
 
   /* -----------------------------
      LOGOUT
@@ -250,6 +191,9 @@ export default function Navbar() {
   async function handleLogout() {
     setAccountOpen(false);
     setShowWelcome(false);
+    
+     // Don't leave one person's guest cart behind for the next login
+  localStorage.removeItem("guestCart");
 
     await signOut({
       callbackUrl: "/",
@@ -271,10 +215,7 @@ export default function Navbar() {
         {/* -----------------------------
             LOGO
         ----------------------------- */}
-        <Link
-          href="/#home"
-          className="flex items-center gap-2"
-        >
+        <Link href="/#home" className="flex items-center gap-2">
           <Image
             src="/images/Alpha.png"
             alt="Alpha Flex India"
@@ -328,10 +269,7 @@ export default function Navbar() {
           {status === "loading" ? (
             <div className="h-10 w-10 rounded-full bg-gray-100 animate-pulse" />
           ) : session ? (
-            <div
-              ref={accountRef}
-              className="relative"
-            >
+            <div ref={desktopAccountRef} className="relative">
               {/* USER AVATAR */}
               <button
                 type="button"
@@ -349,24 +287,10 @@ export default function Navbar() {
               <AnimatePresence>
                 {accountOpen && (
                   <motion.div
-                    initial={{
-                      opacity: 0,
-                      y: -8,
-                      scale: 0.97,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                      scale: 1,
-                    }}
-                    exit={{
-                      opacity: 0,
-                      y: -8,
-                      scale: 0.97,
-                    }}
-                    transition={{
-                      duration: 0.18,
-                    }}
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                    transition={{ duration: 0.18 }}
                     className="absolute right-0 top-14 z-[110] w-[280px] overflow-hidden rounded-2xl bg-white shadow-xl border border-gray-100"
                   >
 
@@ -394,9 +318,7 @@ export default function Navbar() {
                     {/* MY ACCOUNT */}
                     <Link
                       href="/account"
-                      onClick={() =>
-                        setAccountOpen(false)
-                      }
+                      onClick={() => setAccountOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       <AccountIcon />
@@ -406,9 +328,7 @@ export default function Navbar() {
                     {/* CART */}
                     <Link
                       href="/cart"
-                      onClick={() =>
-                        setAccountOpen(false)
-                      }
+                      onClick={() => setAccountOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       <CartIcon />
@@ -493,10 +413,7 @@ export default function Navbar() {
           {status === "loading" ? (
             <div className="h-9 w-9 rounded-full bg-gray-100 animate-pulse" />
           ) : session ? (
-            <div
-              ref={accountRef}
-              className="relative"
-            >
+           <div ref={mobileAccountRef} className="relative">
               <button
                 type="button"
                 aria-label={`Logged in as ${userName}`}
@@ -513,24 +430,10 @@ export default function Navbar() {
               <AnimatePresence>
                 {accountOpen && (
                   <motion.div
-                    initial={{
-                      opacity: 0,
-                      y: -8,
-                      scale: 0.97,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                      scale: 1,
-                    }}
-                    exit={{
-                      opacity: 0,
-                      y: -8,
-                      scale: 0.97,
-                    }}
-                    transition={{
-                      duration: 0.18,
-                    }}
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                    transition={{ duration: 0.18 }}
                     className="absolute right-0 top-12 z-[110] w-[260px] overflow-hidden rounded-2xl bg-white shadow-xl border border-gray-100"
                   >
 
@@ -615,32 +518,24 @@ export default function Navbar() {
           {/* MOBILE MENU BUTTON */}
           <button
             aria-label="Menu"
-            onClick={() =>
-              setMenuOpen((v) => !v)
-            }
+            onClick={() => setMenuOpen((v) => !v)}
             className="flex flex-col gap-1.5 p-2"
           >
             <span
               className={`w-6 h-0.5 bg-ink transition-transform ${
-                menuOpen
-                  ? "rotate-45 translate-y-2"
-                  : ""
+                menuOpen ? "rotate-45 translate-y-2" : ""
               }`}
             />
 
             <span
               className={`w-6 h-0.5 bg-ink transition-opacity ${
-                menuOpen
-                  ? "opacity-0"
-                  : ""
+                menuOpen ? "opacity-0" : ""
               }`}
             />
 
             <span
               className={`w-6 h-0.5 bg-ink transition-transform ${
-                menuOpen
-                  ? "-rotate-45 -translate-y-2"
-                  : ""
+                menuOpen ? "-rotate-45 -translate-y-2" : ""
               }`}
             />
           </button>
@@ -654,22 +549,10 @@ export default function Navbar() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            initial={{
-              height: 0,
-              opacity: 0,
-            }}
-            animate={{
-              height: "auto",
-              opacity: 1,
-            }}
-            exit={{
-              height: 0,
-              opacity: 0,
-            }}
-            transition={{
-              duration: 0.3,
-              ease: "easeInOut",
-            }}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
             className="lg:hidden overflow-hidden bg-surface border-t border-ink/5"
           >
             <div className="flex flex-col gap-4 px-6 pb-6 pt-4">
@@ -679,9 +562,7 @@ export default function Navbar() {
                   key={link.label}
                   href={link.href}
                   className="text-ink/80 font-medium"
-                  onClick={() =>
-                    setMenuOpen(false)
-                  }
+                  onClick={() => setMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
@@ -691,9 +572,7 @@ export default function Navbar() {
               {!session && (
                 <Link
                   href="/login"
-                  onClick={() =>
-                    setMenuOpen(false)
-                  }
+                  onClick={() => setMenuOpen(false)}
                   className="text-ink/80 font-medium"
                 >
                   Login
@@ -704,9 +583,7 @@ export default function Navbar() {
               {session && (
                 <Link
                   href="/account"
-                  onClick={() =>
-                    setMenuOpen(false)
-                  }
+                  onClick={() => setMenuOpen(false)}
                   className="text-ink/80 font-medium"
                 >
                   My Account
@@ -716,9 +593,7 @@ export default function Navbar() {
               {/* MOBILE CART */}
               <Link
                 href="/cart"
-                onClick={() =>
-                  setMenuOpen(false)
-                }
+                onClick={() => setMenuOpen(false)}
                 className="text-ink/80 font-medium"
               >
                 Shopping Cart
@@ -764,24 +639,10 @@ export default function Navbar() {
       <AnimatePresence>
         {showWelcome && session && (
           <motion.div
-            initial={{
-              opacity: 0,
-              y: -15,
-              scale: 0.95,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              scale: 1,
-            }}
-            exit={{
-              opacity: 0,
-              y: -15,
-              scale: 0.95,
-            }}
-            transition={{
-              duration: 0.25,
-            }}
+            initial={{ opacity: 0, y: -15, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -15, scale: 0.95 }}
+            transition={{ duration: 0.25 }}
             className="fixed top-24 right-6 z-[100] w-[280px]"
           >
             <div className="flex items-center gap-3 rounded-xl bg-white px-4 py-3 shadow-xl border border-gray-100">
@@ -805,9 +666,7 @@ export default function Navbar() {
               {/* CLOSE */}
               <button
                 type="button"
-                onClick={() =>
-                  setShowWelcome(false)
-                }
+                onClick={() => setShowWelcome(false)}
                 className="ml-auto text-gray-400 hover:text-gray-700 text-lg"
                 aria-label="Close"
               >

@@ -2,8 +2,16 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+
+type OrderSummary = {
+  id: string;
+  orderNumber: string;
+  status: string;
+  total: number | string;
+  createdAt: string;
+};
 
 function UserIcon() {
   return (
@@ -66,6 +74,9 @@ export default function AccountPage() {
 
   const { data: session, status } = useSession();
 
+  // null = still loading, [] = no orders
+  const [orders, setOrders] = useState<OrderSummary[] | null>(null);
+
   /* -----------------------------
      REDIRECT IF NOT LOGGED IN
   ----------------------------- */
@@ -74,6 +85,46 @@ export default function AccountPage() {
       router.replace("/login");
     }
   }, [status, router]);
+
+  /* -----------------------------
+     LOAD THIS USER'S ORDERS
+  ----------------------------- */
+  useEffect(() => {
+    if (status !== "authenticated") {
+      return;
+    }
+
+    let cancelled = false;
+
+    fetch("/api/orders", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((result) => {
+        if (!cancelled) {
+          setOrders(result?.success ? result.data : []);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setOrders([]);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status]);
+
+  /* -----------------------------
+     LOGOUT
+  ----------------------------- */
+  function handleLogout() {
+    // Don't leave one person's guest cart behind for the next login
+    localStorage.removeItem("guestCart");
+
+    signOut({
+      callbackUrl: "/",
+    });
+  }
 
   /* -----------------------------
      LOADING
@@ -104,9 +155,9 @@ export default function AccountPage() {
 
   return (
     <main
-  className="min-h-screen bg-[#f8f9fc]"
-  style={{ fontFamily: "'Times New Roman', Times, serif" }}
->
+      className="min-h-screen bg-[#f8f9fc]"
+      style={{ fontFamily: "'Times New Roman', Times, serif" }}
+    >
 
       {/* HEADER */}
       <section className="bg-white border-b border-gray-100">
@@ -142,7 +193,7 @@ export default function AccountPage() {
               </h2>
 
               <p className="text-sm text-gray-500 mt-1">
-                Your account information from Google.
+                Your account information.
               </p>
 
             </div>
@@ -252,11 +303,7 @@ export default function AccountPage() {
               {/* LOGOUT */}
               <button
                 type="button"
-                onClick={() =>
-                  signOut({
-                    callbackUrl: "/",
-                  })
-                }
+                onClick={handleLogout}
                 className="w-full flex items-center gap-4 rounded-xl px-4 py-4 text-left hover:bg-red-50 transition-colors"
               >
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-600">
@@ -282,40 +329,94 @@ export default function AccountPage() {
         {/* ORDERS SECTION */}
         <div className="mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 
-          <div className="px-6 py-6 border-b border-gray-100">
+          <div className="px-6 py-6 border-b border-gray-100 flex items-start justify-between gap-4">
 
-            <h2 className="text-lg font-semibold text-gray-900">
-              My Orders
-            </h2>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">
+                My Orders
+              </h2>
 
-            <p className="text-sm text-gray-500 mt-1">
-              Your orders will appear here after you place an order.
-            </p>
-
-          </div>
-
-          <div className="px-6 py-12 text-center">
-
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-gray-400">
-              <CartIcon />
+              <p className="text-sm text-gray-500 mt-1">
+                Track your orders until delivery.
+              </p>
             </div>
 
-            <h3 className="mt-4 text-base font-semibold text-gray-900">
-              No orders yet
-            </h3>
-
-            <p className="mt-1 text-sm text-gray-500">
-              Start shopping to see your orders here.
-            </p>
-
-            <Link
-              href="/#products"
-              className="inline-flex mt-5 px-6 py-2.5 rounded-full bg-navy text-white text-sm font-semibold hover:bg-indigo transition-colors"
-            >
-              Browse Products
-            </Link>
+            {orders && orders.length > 0 && (
+              <Link
+                href="/orders"
+                className="text-sm font-semibold text-[#315cff] hover:underline whitespace-nowrap"
+              >
+                View all
+              </Link>
+            )}
 
           </div>
+
+          {/* LOADING */}
+          {orders === null && (
+            <div className="px-6 py-12 text-center text-sm text-gray-500">
+              Loading your orders...
+            </div>
+          )}
+
+          {/* EMPTY */}
+          {orders !== null && orders.length === 0 && (
+            <div className="px-6 py-12 text-center">
+
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                <CartIcon />
+              </div>
+
+              <h3 className="mt-4 text-base font-semibold text-gray-900">
+                No orders yet
+              </h3>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Start shopping to see your orders here.
+              </p>
+
+              <Link
+                href="/#products"
+                className="inline-flex mt-5 px-6 py-2.5 rounded-full bg-navy text-white text-sm font-semibold hover:bg-indigo transition-colors"
+              >
+                Browse Products
+              </Link>
+
+            </div>
+          )}
+
+          {/* ORDER LIST (latest 5) */}
+          {orders !== null && orders.length > 0 && (
+            <div className="divide-y divide-gray-100">
+              {orders.slice(0, 5).map((order) => (
+                <Link
+                  key={order.id}
+                  href={`/orders/${order.id}`}
+                  className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-gray-50 transition-colors"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {order.orderNumber}
+                    </p>
+
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-gray-900">
+                      ₹{Number(order.total).toFixed(2)}
+                    </p>
+
+                    <span className="inline-block mt-1 text-xs font-medium px-3 py-1 rounded-full bg-gray-100 text-gray-700">
+                      {order.status}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
 
         </div>
 

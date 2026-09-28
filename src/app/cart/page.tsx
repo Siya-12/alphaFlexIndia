@@ -75,6 +75,8 @@ export default function CartPage() {
   const [cart, setCart] = useState<CartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+const [actionError, setActionError] = useState("");
 
   // =====================================================
   // GUEST CART → UI
@@ -280,15 +282,33 @@ export default function CartPage() {
     setLoading(true);
     setError("");
 
-    const storedCart = localStorage.getItem("guestCart");
+    // ----------------------------------------
+    // 1. If user is NOT logged in
+    //    show guest cart
+    // ----------------------------------------
 
-    if (storedCart) {
+    if (!session?.user) {
+      const storedCart =
+        localStorage.getItem("guestCart");
+
+      if (!storedCart) {
+        setCart({
+          id: null,
+          items: [],
+          itemCount: 0,
+          subtotal: 0,
+        });
+
+        return;
+      }
+
       const guestItems: GuestCartItem[] =
         JSON.parse(storedCart);
 
-      const items: CartItem[] = guestItems.map(
-        (item: GuestCartItem) => ({
+      const items: CartItem[] =
+        guestItems.map((item) => ({
           id: item.variantId,
+
           quantity: item.quantity,
 
           variant: {
@@ -298,7 +318,8 @@ export default function CartPage() {
             unit: item.variant.unit,
             sku: item.variant.sku,
             price: item.variant.price,
-            comparePrice: null,
+            comparePrice:
+              item.variant.comparePrice,
             availableQuantity: 0,
           },
 
@@ -307,28 +328,31 @@ export default function CartPage() {
             name: item.product.name,
             slug: item.product.slug,
 
-            productimage: item.product.image
-              ? [
-                  {
-                    url: item.product.image,
-                    altText: null,
-                  },
-                ]
-              : [],
+            productimage:
+              item.product.image
+                ? [
+                    {
+                      url: item.product.image,
+                      altText: null,
+                    },
+                  ]
+                : [],
           },
 
           total:
-            item.variant.price * item.quantity,
-        })
-      );
+            item.variant.price *
+            item.quantity,
+        }));
 
       const subtotal = items.reduce(
-        (sum, item) => sum + item.total,
+        (sum, item) =>
+          sum + item.total,
         0
       );
 
       const itemCount = items.reduce(
-        (sum, item) => sum + item.quantity,
+        (sum, item) =>
+          sum + item.quantity,
         0
       );
 
@@ -342,14 +366,21 @@ export default function CartPage() {
       return;
     }
 
-    setCart({
-      id: null,
-      items: [],
-      itemCount: 0,
-      subtotal: 0,
-    });
+    // ----------------------------------------
+    // 2. User IS logged in
+    //    fetch database cart
+    // ----------------------------------------
+
+    const databaseCart =
+      await fetchDatabaseCart();
+
+    setCart(databaseCart);
+
   } catch (error) {
-    console.error(error);
+    console.error(
+      "Fetch cart error:",
+      error
+    );
 
     setError(
       error instanceof Error
@@ -359,7 +390,7 @@ export default function CartPage() {
   } finally {
     setLoading(false);
   }
-}, []);
+}, [session]);
 
   // =====================================================
   // LOAD WHEN AUTH STATUS IS READY
@@ -415,6 +446,59 @@ useEffect(() => {
     fetchCart();
   }
 
+// =====================================================
+  // UPDATE CART QUANTITY
+  // =====================================================
+
+
+  async function updateQuantity(item: CartItem, change: number) {
+  // Guest user → localStorage
+  if (!session?.user) {
+    updateGuestCartQuantity(item.variant.id, change);
+    return;
+  }
+
+  // Logged-in user → API
+  const newQuantity = item.quantity + change;
+
+  try {
+    setUpdatingId(item.id);
+    setActionError("");
+
+    // PATCH rejects quantity <= 0, so use DELETE when it drops to 0
+    const response =
+      newQuantity <= 0
+        ? await fetch("/api/cart", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cartItemId: item.id }),
+          })
+        : await fetch("/api/cart", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              cartItemId: item.id,
+              quantity: newQuantity,
+            }),
+          });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Failed to update cart");
+    }
+
+    // Refresh cart without the full-page loading screen
+    const databaseCart = await fetchDatabaseCart();
+    setCart(databaseCart);
+  } catch (err) {
+    setActionError(
+      err instanceof Error ? err.message : "Failed to update cart"
+    );
+  } finally {
+    setUpdatingId(null);
+  }
+}
   // =====================================================
   // PLACE ORDER
   // =====================================================
@@ -427,7 +511,7 @@ useEffect(() => {
       if (!session?.user) {
         router.push(
           `/login?callbackUrl=${encodeURIComponent(
-            "/cart"
+            "/checkout"
           )}`
         );
 
@@ -562,6 +646,9 @@ useEffect(() => {
           {/* CART ITEMS */}
 
           <div className="lg:col-span-2 space-y-4">
+            {actionError && (
+  <p className="text-red-600 text-sm">{actionError}</p>
+)}
 
             {cart.items.map((item) => (
               <div
@@ -623,37 +710,27 @@ useEffect(() => {
                   {/* QUANTITY */}
 
                   <div className="flex items-center gap-3 mt-4">
+  <button
+    onClick={() => updateQuantity(item, -1)}
+    disabled={updatingId === item.id}
+    className="border rounded px-3 py-1 disabled:opacity-50"
+  >
+    −
+  </button>
 
-                    <button
-                      onClick={() =>
-                        updateGuestCartQuantity(
-                          item.variant.id,
-                          -1
-                        )
-                      }
-                      className="border rounded px-3 py-1"
-                    >
-                      −
-                    </button>
+  <span>{item.quantity}</span>
 
-                    <span>
-                      {item.quantity}
-                    </span>
-
-                    <button
-                      onClick={() =>
-                        updateGuestCartQuantity(
-                          item.variant.id,
-                          1
-                        )
-                      }
-                      className="border rounded px-3 py-1"
-                    >
-                      +
-                    </button>
-
-                  </div>
-
+  <button
+    onClick={() => updateQuantity(item, 1)}
+    disabled={
+      updatingId === item.id ||
+      (!!session?.user && item.quantity >= item.variant.availableQuantity)
+    }
+    className="border rounded px-3 py-1 disabled:opacity-50"
+  >
+    +
+  </button>
+</div>
                 </div>
 
                 {/* TOTAL */}
