@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import { Fragment, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -82,31 +82,31 @@ const PACKS: Pack[] = [
     group: "combo",
     label: "Valmo Branded Combo 1",
     includes: '10×14 (500 pcs), 16×18 (200 pcs) & 4×6" (2 Roll)',
-    price: 2473,
+    price: 273.99,
     combo: 1,
   },
   {
     id: "combo-2",
     group: "combo",
     label: "Valmo Branded Combo 2",
-    includes: '10×14 (3000 pcs), 16×18 (400 pcs) & 4×6" (4 Roll)',
-    price: 10915,
+    includes: '10×14 (1,000 pcs), 16×18 (400 pcs) & 4×6" (4 Roll)',
+    price: 944.99,
     combo: 2,
   },
 
   // ---------- SMALL (10×14) ----------
-  { id: "small-200", group: "small", label: "10×14 Pack of 200", includes: "200 pcs", price: 600, size: "10x14", pieces: 200 },
-  { id: "small-500", group: "small", label: "10×14 Pack of 500", includes: "500 pcs", price: 1170, size: "10x14", pieces: 500 },
-  { id: "small-1000", group: "small", label: "10×14 Pack of 1000", includes: "1000 pcs", price: 2300, size: "10x14", pieces: 1000 },
-  { id: "small-2000", group: "small", label: "10×14 Pack of 2000", includes: "2000 pcs", price: 4600, size: "10x14", pieces: 2000 },
-  { id: "small-5000", group: "small", label: "10×14 Pack of 5000", includes: "5000 pcs", price: 11500, size: "10x14", pieces: 5000 },
+  { id: "small-200", group: "small", label: "10×14 Pack of 200", includes: "200 pcs", price: 599.99, size: "10x14", pieces: 200 },
+  { id: "small-500", group: "small", label: "10×14 Pack of 500", includes: "500 pcs", price: 1149.99, size: "10x14", pieces: 500 },
+  { id: "small-1000", group: "small", label: "10×14 Pack of 1000", includes: "1000 pcs", price: 2299.99, size: "10x14", pieces: 1000 },
+  { id: "small-2000", group: "small", label: "10×14 Pack of 2000", includes: "2000 pcs", price: 4599.99, size: "10x14", pieces: 2000 },
+  { id: "small-5000", group: "small", label: "10×14 Pack of 5000", includes: "5000 pcs", price: 11499.99, size: "10x14", pieces: 5000 },
 
   // ---------- LARGE (16×18) ----------
-  { id: "large-200", group: "large", label: "16×18 Pack of 200", includes: "200 pcs", price: 996, size: "16x18", pieces: 200 },
-  { id: "large-500", group: "large", label: "16×18 Pack of 500", includes: "500 pcs", price: 2210, size: "16x18", pieces: 500 },
-  { id: "large-1000", group: "large", label: "16×18 Pack of 1000", includes: "1000 pcs", price: 4400, size: "16x18", pieces: 1000 },
-  { id: "large-2000", group: "large", label: "16×18 Pack of 2000", includes: "2000 pcs", price: 8860, size: "16x18", pieces: 2000 },
-  { id: "large-5000", group: "large", label: "16×18 Pack of 5000", includes: "5000 pcs", price: 22100, size: "16x18", pieces: 5000 },
+  { id: "large-200", group: "large", label: "16×18 Pack of 200", includes: "200 pcs", price: 895.99, size: "16x18", pieces: 200 },
+  { id: "large-500", group: "large", label: "16×18 Pack of 500", includes: "500 pcs", price: 2239.99, size: "16x18", pieces: 500 },
+  { id: "large-1000", group: "large", label: "16×18 Pack of 1000", includes: "1000 pcs", price: 4479.99, size: "16x18", pieces: 1000 },
+  { id: "large-2000", group: "large", label: "16×18 Pack of 2000", includes: "2000 pcs", price: 8959.99, size: "16x18", pieces: 2000 },
+  { id: "large-5000", group: "large", label: "16×18 Pack of 5000", includes: "5000 pcs", price: 22399.99, size: "16x18", pieces: 5000 },
 ];
 
 const GROUP_ORDER: GroupKey[] = ["combo", "small", "large"];
@@ -330,8 +330,14 @@ export default function ValmoProductPage() {
           <div>
             <div className="bg-[#eeeeee] rounded-xl overflow-hidden flex items-center justify-center min-h-[550px]">
               <img
-                key={selectedPack.group}
-                src={GROUPS[selectedPack.group].image}
+                key={selectedPack.id}
+                src={
+                  selectedPack.group === "combo"
+                    ? selectedPack.combo === 1
+                      ? "/images/valmo-combo-1.png"
+                      : "/images/valmo-combo-2.png"
+                    : GROUPS[selectedPack.group].image
+                }
                 alt={selectedPack.label}
                 className="w-full h-full max-h-[700px] object-contain"
               />
@@ -339,24 +345,80 @@ export default function ValmoProductPage() {
 
             {/* Thumbnails: one per pack type */}
 
-            <div className="mt-4 flex gap-3">
-              {GROUP_ORDER.map((key) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => handleGroupChange(key)}
-                  aria-label={GROUPS[key].label}
-                  className={`w-20 h-20 rounded-lg border-2 overflow-hidden bg-[#eeeeee] ${
-                    group === key ? "border-blue-500" : "border-transparent"
-                  }`}
-                >
-                  <img
-                    src={GROUPS[key].image}
-                    alt={GROUPS[key].label}
-                    className="w-full h-full object-contain"
-                  />
-                </button>
-              ))}
+            <div className="mt-4 flex gap-3 flex-wrap">
+
+              {/* Combo 1 */}
+              <button
+                type="button"
+                onClick={() => selectPack(PACKS.find((p) => p.id === "combo-1")!)}
+                aria-label="Valmo Combo 1"
+                className={`w-28 h-28 rounded-lg border-2 overflow-hidden bg-[#eeeeee] ${
+                  selectedPack.id === "combo-1"
+                    ? "border-blue-500"
+                    : "border-transparent"
+                }`}
+              >
+                <img
+                  src="/images/valmo-combo-1.png"
+                  alt="Valmo Combo 1"
+                  className="w-full h-full object-contain"
+                />
+              </button>
+
+              {/* Combo 2 */}
+              <button
+                type="button"
+                onClick={() => selectPack(PACKS.find((p) => p.id === "combo-2")!)}
+                aria-label="Valmo Combo 2"
+                className={`w-28 h-28 rounded-lg border-2 overflow-hidden bg-[#eeeeee] ${
+                  selectedPack.id === "combo-2"
+                    ? "border-blue-500"
+                    : "border-transparent"
+                }`}
+              >
+                <img
+                  src="/images/valmo-combo-2.png"
+                  alt="Valmo Combo 2"
+                  className="w-full h-full object-contain"
+                />
+              </button>
+
+              {/* Small Size */}
+              <button
+                type="button"
+                onClick={() => selectPack(PACKS.find((p) => p.id === "small-500")!)}
+                aria-label='Small Size (10×14")'
+                className={`w-28 h-28 rounded-lg border-2 overflow-hidden bg-[#eeeeee] ${
+                  selectedPack.group === "small"
+                    ? "border-blue-500"
+                    : "border-transparent"
+                }`}
+              >
+                <img
+                  src="/images/valmo-10x14.png"
+                  alt='Small Size (10×14")'
+                  className="w-full h-full object-contain"
+                />
+              </button>
+
+              {/* Large Size */}
+              <button
+                type="button"
+                onClick={() => selectPack(PACKS.find((p) => p.id === "large-500")!)}
+                aria-label='Large Size (16×18")'
+                className={`w-28 h-28 rounded-lg border-2 overflow-hidden bg-[#eeeeee] ${
+                  selectedPack.group === "large"
+                    ? "border-blue-500"
+                    : "border-transparent"
+                }`}
+              >
+                <img
+                  src="/images/valmo-16x18.png"
+                  alt='Large Size (16×18")'
+                  className="w-full h-full object-contain"
+                />
+              </button>
+
             </div>
           </div>
 
@@ -602,76 +664,100 @@ export default function ValmoProductPage() {
         </div>
       </section>
 
-      {/* ================= ALL PACKS / PRICING TABLE ================= */}
+      {/* ================= VALMO PRICE LIST ================= */}
 
-      <section className="max-w-6xl mx-auto px-6 pb-16">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+      <section className="max-w-5xl mx-auto px-6 pb-16">
+        <div className="mb-8">
+          <h2 className="text-2xl lg:text-3xl font-semibold italic text-[#111]">
+            VALMO PRICE LIST
+          </h2>
+          <p className="mt-2 text-lg italic text-[#333]">
+            Extra 18% GST Applicable
+          </p>
+        </div>
 
-          <div className="bg-[#12355B] px-6 py-5">
-            <h2 className="text-2xl font-bold text-white">Packs & Pricing</h2>
-            <p className="mt-1 text-sm text-gray-200">
-              Price per pack before GST. Extra 18% GST is applicable. Click a row to select it.
-            </p>
-          </div>
-
+        {/* Small Size */}
+        <div className="mb-10">
+          <h3 className="text-lg lg:text-xl italic text-[#111] mb-4">
+            1. Small Size (10 × 14 inch)
+          </h3>
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse text-sm lg:text-base">
               <thead>
-                <tr className="bg-[#EAF1F8] border-b-2 border-[#12355B]">
-                  <th className="px-6 py-4 text-left text-sm font-bold text-[#12355B] whitespace-nowrap">
-                    Pack
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-[#12355B] whitespace-nowrap">
-                    Includes
-                  </th>
-                  <th className="px-6 py-4 text-right text-sm font-bold text-[#12355B] whitespace-nowrap">
-                    Price (₹)
-                  </th>
+                <tr className="border-b border-gray-200">
+                  <th className="py-3 px-4 text-center font-semibold">Pack Quantity</th>
+                  <th className="py-3 px-4 text-right font-semibold">Price (₹)</th>
                 </tr>
               </thead>
-
               <tbody>
-                {GROUP_ORDER.map((key) => (
-                  <Fragment key={key}>
-                    <tr className="bg-gray-100">
-                      <td
-                        colSpan={3}
-                        className="px-6 py-3 text-sm font-bold text-[#111827]"
-                      >
-                        {GROUPS[key].label}
-                      </td>
-                    </tr>
-
-                    {PACKS.filter((pack) => pack.group === key).map((pack) => (
-                      <tr
-                        key={pack.id}
-                        onClick={() => {
-                          selectPack(pack);
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                        className={`cursor-pointer border-b border-gray-200 transition-colors hover:bg-blue-50 ${
-                          pack.id === selectedPack.id ? "bg-blue-50" : "bg-white"
-                        }`}
-                      >
-                        <td className="px-6 py-4 text-sm font-semibold text-[#111827] whitespace-nowrap">
-                          {pack.label}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-700">
-                          {pack.includes}
-                        </td>
-                        <td className="px-6 py-4 text-right text-sm font-bold text-[#15803D] whitespace-nowrap">
-                          {formatPrice(pack.price)}
-                        </td>
-                      </tr>
-                    ))}
-                  </Fragment>
+                {PACKS.filter((pack) => pack.group === "small").map((pack) => (
+                  <tr key={pack.id} className="border-b border-gray-200">
+                    <td className="py-3 px-4 text-center">{pack.includes}</td>
+                    <td className="py-3 px-4 text-right">{pack.price.toFixed(2)}</td>
+                  </tr>
                 ))}
               </tbody>
             </table>
           </div>
-
         </div>
+
+        {/* Large Size */}
+        <div className="mb-10">
+          <h3 className="text-lg lg:text-xl italic text-[#111] mb-4">
+            2. Large Size (16 × 18 inch)
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm lg:text-base">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="py-3 px-4 text-center font-semibold">Pack Quantity</th>
+                  <th className="py-3 px-4 text-right font-semibold">Price (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PACKS.filter((pack) => pack.group === "large").map((pack) => (
+                  <tr key={pack.id} className="border-b border-gray-200">
+                    <td className="py-3 px-4 text-center">{pack.includes}</td>
+                    <td className="py-3 px-4 text-right">{pack.price.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Combos */}
+        <div>
+          <h3 className="text-lg lg:text-xl italic text-[#111] mb-4">
+            3. Valmo Branded Combos
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm lg:text-base">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="py-3 px-4 text-left font-semibold">Combo</th>
+                  <th className="py-3 px-4 text-left font-semibold">Quantity</th>
+                  <th className="py-3 px-4 text-right font-semibold">Price (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PACKS.filter((pack) => pack.group === "combo").map((pack) => (
+                  <tr key={pack.id} className="border-b border-gray-200">
+                    <td className="py-3 px-4">{pack.combo === 1 ? "Combo 1" : "Combo 2"}</td>
+                    <td className="py-3 px-4">{pack.includes}</td>
+                    <td className="py-3 px-4 text-right">{pack.price.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p className="mt-6 text-sm lg:text-base italic text-[#333]">
+          Note: All prices above are reduced by ₹0.01 from the displayed prices. Extra 18% GST is applicable.
+        </p>
       </section>
+
     </main>
   );
 }
