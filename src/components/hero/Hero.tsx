@@ -280,7 +280,7 @@ export function BrandedProductsCards() {
             </h3>
 
             <a
-              href="/products"
+              href="/valmo"
               className="mt-6 inline-flex items-center justify-center rounded-lg bg-[#d99a00] px-8 py-4 text-lg font-bold text-white transition hover:bg-[#c58900]"
             >
               Shop Now
