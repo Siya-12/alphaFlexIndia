@@ -23,6 +23,20 @@ type ProductVariantInput = {
 
 
 export async function GET(request: NextRequest) {
+    try {
+    const connectionInfo = await prisma.$queryRaw<
+      Array<{
+        charset: string;
+        collation: string;
+      }>
+    >`
+      SELECT
+        @@character_set_connection AS charset,
+        @@collation_connection AS collation
+    `;
+
+    console.log("PRISMA CONNECTION:", connectionInfo);
+
   try {
     const { searchParams } = new URL(request.url);
 
