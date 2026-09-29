@@ -30,85 +30,91 @@ export async function GET(request: NextRequest) {
     const slug = searchParams.get("slug");
     const search = searchParams.get("search");
 
-    let products = await prisma.product.findMany({
-      where: {
-        status: "ACTIVE",
+    // let products = await prisma.product.findMany({
+    //   where: {
+    //     status: "ACTIVE",
 
-        ...(categorySlug
-          ? {
-              category: {
-                slug: categorySlug,
-                isActive: true,
-              },
-            }
-          : {}),
+    //     ...(categorySlug
+    //       ? {
+    //           category: {
+    //             slug: categorySlug,
+    //             isActive: true,
+    //           },
+    //         }
+    //       : {}),
 
-        ...(slug
-          ? {
-              slug,
-            }
-          : {}),
-      },
+    //     ...(slug
+    //       ? {
+    //           slug,
+    //         }
+    //       : {}),
+    //   },
 
-      orderBy: {
-        createdAt: "desc",
-      },
+    //   orderBy: {
+    //     createdAt: "desc",
+    //   },
 
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        description: true,
-        status: true,
+    //   select: {
+    //     id: true,
+    //     name: true,
+    //     slug: true,
+    //     description: true,
+    //     status: true,
 
-        category: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
+    //     category: {
+    //       select: {
+    //         id: true,
+    //         name: true,
+    //         slug: true,
+    //       },
+    //     },
 
-        productimage: {
-          orderBy: {
-            sortOrder: "asc",
-          },
-          select: {
-            id: true,
-            url: true,
-            altText: true,
-            sortOrder: true,
-          },
-        },
+    //     productimage: {
+    //       orderBy: {
+    //         sortOrder: "asc",
+    //       },
+    //       select: {
+    //         id: true,
+    //         url: true,
+    //         altText: true,
+    //         sortOrder: true,
+    //       },
+    //     },
 
-        productvariant: {
-          where: {
-            isActive: true,
-          },
-          orderBy: {
-            price: "asc",
-          },
-          select: {
-            id: true,
-            name: true,
-            size: true,
-            unit: true,
-            sku: true,
-            price: true,
-            comparePrice: true,
-          },
-        },
-      },
-    });
+    //     productvariant: {
+    //       where: {
+    //         isActive: true,
+    //       },
+    //       orderBy: {
+    //         price: "asc",
+    //       },
+    //       select: {
+    //         id: true,
+    //         name: true,
+    //         size: true,
+    //         unit: true,
+    //         sku: true,
+    //         price: true,
+    //         comparePrice: true,
+    //       },
+    //     },
+    //   },
+    // });
 
-    if (search && search.trim()) {
-      const q = search.trim().toLowerCase();
-      products = products.filter(
-        (product) =>
-          product.name?.toLowerCase().includes(q) ||
-          product.description?.toLowerCase().includes(q)
-      );
-    }
+    // if (search && search.trim()) {
+    //   const q = search.trim().toLowerCase();
+    //   products = products.filter(
+    //     (product) =>
+    //       product.name?.toLowerCase().includes(q) ||
+    //       product.description?.toLowerCase().includes(q)
+    //   );
+    // }
+    const products = await prisma.product.findMany({
+  where: {
+    status: "ACTIVE",
+  },
+  take: 10,
+});
 
     return NextResponse.json(
       {
