@@ -45,20 +45,20 @@ const quantityOptions = [
 ];
 
 const sizeOptions = [
-  { size: "6.5 × 8", price: 0.84, gst: 0.15, total: 0.99 },
-  { size: "8 × 10", price: 1.26, gst: 0.23, total: 1.49 },
-  { size: "8 × 12", price: 1.42, gst: 0.26, total: 1.68 },
-  { size: "9 × 12", price: 1.59, gst: 0.29, total: 1.88 },
-  { size: "10 × 12", price: 1.79, gst: 0.32, total: 2.11 },
-  { size: "10 × 13", price: 1.91, gst: 0.35, total: 2.26 },
-  { size: "10 × 14", price: 2.02, gst: 0.37, total: 2.39 },
-  { size: "12 × 14", price: 2.56, gst: 0.46, total: 3.02 },
-  { size: "12.5 × 16", price: 2.90, gst: 0.52, total: 3.42 },
-  { size: "14 × 18", price: 3.69, gst: 0.67, total: 4.36 },
-  { size: "16 × 20", price: 4.74, gst: 0.85, total: 5.59 },
-  { size: "20 × 23", price: 7.04, gst: 1.27, total: 8.31 },
-  { size: "22 × 24", price: 6.93, gst: 1.25, total: 8.18 },
-  { size: "24 × 26", price: 9.06, gst: 1.63, total: 10.69 },
+  { size: "6.5 X 8", price: 0.84, gst: 0.15, total: 0.99 },
+  { size: "8 X 10", price: 1.26, gst: 0.23, total: 1.49 },
+  { size: "8 X 12", price: 1.42, gst: 0.26, total: 1.68 },
+  { size: "9 X 12", price: 1.59, gst: 0.29, total: 1.88 },
+  { size: "10 X 12", price: 1.79, gst: 0.32, total: 2.11 },
+  { size: "10 X 13", price: 1.91, gst: 0.35, total: 2.26 },
+  { size: "10 X 14", price: 2.02, gst: 0.37, total: 2.39 },
+  { size: "12 X 14", price: 2.56, gst: 0.46, total: 3.02 },
+  { size: "12.5 X 16", price: 2.90, gst: 0.52, total: 3.42 },
+  { size: "14 X 18", price: 3.69, gst: 0.67, total: 4.36 },
+  { size: "16 X 20", price: 4.74, gst: 0.85, total: 5.59 },
+  { size: "20 X 23", price: 7.04, gst: 1.27, total: 8.31 },
+  { size: "22 X 24", price: 6.93, gst: 1.25, total: 8.18 },
+  { size: "24 X 26", price: 9.06, gst: 1.63, total: 10.69 },
 ];
 
 export default function MeeshoProductPage() {

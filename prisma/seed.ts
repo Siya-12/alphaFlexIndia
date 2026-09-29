@@ -5,20 +5,20 @@ import { prisma } from "../src/lib/prisma";
 // price = GST-inclusive total per piece, so the amount charged
 // matches the total shown on the product page.
 const sizes = [
-  { size: "6.5 × 8", total: 0.99 },
-  { size: "8 × 10", total: 1.49 },
-  { size: "8 × 12", total: 1.68 },
-  { size: "9 × 12", total: 1.88 },
-  { size: "10 × 12", total: 2.11 },
-  { size: "10 × 13", total: 2.26 },
-  { size: "10 × 14", total: 2.39 },
-  { size: "12 × 14", total: 3.02 },
-  { size: "12.5 × 16", total: 3.42 },
-  { size: "14 × 18", total: 4.36 },
-  { size: "16 × 20", total: 5.59 },
-  { size: "20 × 23", total: 8.31 },
-  { size: "22 × 24", total: 8.18 },
-  { size: "24 × 26", total: 10.69 },
+  { size: "6.5 X 8", total: 0.99 },
+  { size: "8 X 10", total: 1.49 },
+  { size: "8 X 12", total: 1.68 },
+  { size: "9 X 12", total: 1.88 },
+  { size: "10 X 12", total: 2.11 },
+  { size: "10 X 13", total: 2.26 },
+  { size: "10 X 14", total: 2.39 },
+  { size: "12 X 14", total: 3.02 },
+  { size: "12.5 X 16", total: 3.42 },
+  { size: "14 X 18", total: 4.36 },
+  { size: "16 X 20", total: 5.59 },
+  { size: "20 X 23", total: 8.31 },
+  { size: "22 X 24", total: 8.18 },
+  { size: "24 X 26", total: 10.69 },
 ];
 
 async function main() {
@@ -65,11 +65,17 @@ async function main() {
   }
 
   for (const item of sizes) {
-    const sku = `MEESHO-52M-${item.size.replace(/[^0-9.]+/g, "-")}`;
+    const sku = `MEESHO-52M-${item.size
+  .replace(/\s+/g, "")
+  .replace(/×/g, "x")
+  .replace(/[^a-zA-Z0-9.]+/g, "-")
+  .toUpperCase()}`;
+  
 
     const variant = await prisma.productvariant.upsert({
       where: { sku },
-      update: { price: item.total, isActive: true, updatedAt: now },
+      update: { price: item.total, isActive: true, updatedAt: now, name: item.size,
+size: item.size, },
       create: {
         id: randomUUID(),
         productId: product.id,
