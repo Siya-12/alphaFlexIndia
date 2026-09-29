@@ -101,24 +101,18 @@ const router = useRouter();
       return;
     }
 
-    const response = await fetch("/api/products?search=Meesho", {
+    const response = await fetch("/api/products/meesho-poly-transparent", {
       method: "GET",
       cache: "no-store",
     });
 
     const result = await response.json();
 
-    if (!response.ok || !result.success) {
+    if (!response.ok || !result.success || !result.data) {
       throw new Error(result.message || "Failed to find Meesho product");
     }
 
-    const product = result.data?.find((item: Product) =>
-      item.name?.toLowerCase().includes("meesho")
-    );
-
-    if (!product) {
-      throw new Error("Meesho product was not found in the database.");
-    }
+    const product = result.data;
 
     const variant = product.productvariant?.find(
       (item: ProductVariant) => item.size?.trim() === selectedSize.trim()

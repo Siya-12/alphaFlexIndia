@@ -208,24 +208,18 @@ export default function ValmoProductPage() {
 
       setAdding(true);
 
-      const response = await fetch("/api/products?search=Valmo", {
+      const response = await fetch("/api/products/valmo-branded-courier-bags", {
         method: "GET",
         cache: "no-store",
       });
 
       const result = await response.json();
 
-      if (!response.ok || !result.success) {
+      if (!response.ok || !result.success || !result.data) {
         throw new Error(result.message || "Failed to find Valmo products");
       }
 
-      const valmoProducts: Product[] = (result.data ?? []).filter(
-        (item: Product) => item.name?.toLowerCase().includes("valmo")
-      );
-
-      if (valmoProducts.length === 0) {
-        throw new Error("Valmo products were not found in the database.");
-      }
+      const valmoProducts: Product[] = [result.data];
 
       // Works whether the packs are variants of one product
       // or separate products with one variant each.

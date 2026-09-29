@@ -23,27 +23,14 @@ type ProductVariantInput = {
 
 
 export async function GET(request: NextRequest) {
-    try {
-    const connectionInfo = await prisma.$queryRaw<
-      Array<{
-        charset: string;
-        collation: string;
-      }>
-    >`
-      SELECT
-        @@character_set_connection AS charset,
-        @@collation_connection AS collation
-    `;
-
-    console.log("PRISMA CONNECTION:", connectionInfo);
-
   try {
     const { searchParams } = new URL(request.url);
 
     const categorySlug = searchParams.get("category");
+    const slug = searchParams.get("slug");
     const search = searchParams.get("search");
 
-    const products = await prisma.product.findMany({
+    let products = await prisma.product.findMany({
       where: {
         status: "ACTIVE",
 
@@ -56,20 +43,9 @@ export async function GET(request: NextRequest) {
             }
           : {}),
 
-        ...(search
+        ...(slug
           ? {
-              OR: [
-                {
-                  name: {
-                    contains: search,
-                  },
-                },
-                {
-                  description: {
-                    contains: search,
-                  },
-                },
-              ],
+              slug,
             }
           : {}),
       },
@@ -124,6 +100,15 @@ export async function GET(request: NextRequest) {
         },
       },
     });
+
+    if (search && search.trim()) {
+      const q = search.trim().toLowerCase();
+      products = products.filter(
+        (product) =>
+          product.name?.toLowerCase().includes(q) ||
+          product.description?.toLowerCase().includes(q)
+      );
+    }
 
     return NextResponse.json(
       {
