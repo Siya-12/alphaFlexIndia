@@ -457,7 +457,7 @@ const router = useRouter();
             <button
               type="button"
               onClick={handleAddToCart}
-              className="mt-6 w-full h-12 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium transition"
+              className="mt-6 w-full h-12 rounded-lg bg-[#12355B] hover:bg-blue-700 text-white text-lg font-medium transition"
             >
               Add to Cart
             </button>

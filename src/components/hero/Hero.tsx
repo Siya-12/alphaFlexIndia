@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 const stats = [
   { target: 500, suffix: "+", label: "Clients" },
@@ -9,6 +11,56 @@ const stats = [
   { target: 7, suffix: "+", label: "Machines" },
   { target: 100, suffix: "%", label: "Quality" },
 ];
+
+const brands = [
+  {
+    label: "Meesho",
+    title: "Meesho Branded Products",
+    description: "Branded courier bags made to Meesho packaging standards.",
+    href: "/meesho",
+    image: "/images/meesho.png",
+    imageClass: "max-h-[110px] max-w-[110px]",
+    dot: "#62094f",
+    glow: "rgba(98, 9, 79, 0.10)",
+  },
+  {
+    label: "Valmo",
+    title: "Valmo Branded Products",
+    description: "Tamper-proof bags built for Valmo logistics.",
+    href: "/valmo",
+    image: "/images/valmo.png",
+    imageClass: "max-h-[90px] max-w-[130px]",
+    dot: "#145789",
+    glow: "rgba(20, 87, 137, 0.10)",
+  },
+  {
+    label: "Plain",
+    title: "Plain Poly Courier Bags",
+    description: "Durable plain courier bags for every shipping need.",
+    // ✏️ Your old code linked this card to "/valmo" (likely a copy-paste slip).
+    // Set this to the correct route.
+    href: "/poly",
+    image: "/images/poly-courier-bag.png",
+    imageClass: "max-h-[130px] max-w-[130px]",
+    dot: "#d49a1b",
+    glow: "rgba(212, 154, 27, 0.12)",
+  },
+];
+
+const container: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12 } },
+};
+
+const item: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
 
 function useCountUp(target: number, active: boolean, duration = 1500) {
   const [value, setValue] = useState(0);
@@ -64,31 +116,6 @@ function Stat({
   );
 }
 
-const container: Variants = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const item: Variants = {
-  hidden: {
-    opacity: 0,
-    y: 24,
-  },
-
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut",
-    },
-  },
-};
 
 // ── Puzzle reveal config ──────────────────────────────
 const GRID = 5;
@@ -185,164 +212,89 @@ function PuzzleImage() {
 ===================================================== */
 
 export function BrandedProductsCards() {
+  const reduce = useReducedMotion();
+
   return (
-    <section className="w-full px-3 sm:px-6 lg:px-10 py-16 bg-surface">
+    <section className="w-full bg-surface px-3 py-16 sm:px-6 lg:px-10 lg:py-20">
+      {/* Heading (delete this block if you want only the cards) */}
+      <motion.div
+        initial={reduce ? false : { opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.5 }}
+        className="mx-auto mb-12 max-w-2xl text-center"
+      >
+        <span className="inline-flex items-center gap-2 rounded-full border border-[#0E1B4D]/10 bg-white px-4 py-2 text-sm text-[#0E1B4D] shadow-sm">
+          <span className="h-2 w-2 rounded-full bg-[#3D3FA1]" />
+          Branded Packaging
+        </span>
+        <h2 className="mt-5 text-4xl font-bold tracking-tight text-[#0E1B4D] sm:text-5xl">
+          Shop by{" "}
+          <span className="font-serif italic text-[#3D3FA1]">Brand</span>
+        </h2>
+      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
-        {/* ================= MEESHO ================= */}
-
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 30,
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-          }}
-          viewport={{
-            once: true,
-          }}
-          transition={{
-            duration: 0.5,
-          }}
-          className="min-h-[285px] rounded-xl bg-[#62094f] px-8 xl:px-10 py-8 flex items-center gap-7 xl:gap-9"
-        >
-
-          <div className="w-[150px] h-[150px] xl:w-[170px] xl:h-[170px] shrink-0 rounded-[25px] bg-white flex items-center justify-center overflow-hidden">
-
-            <img
-              src="/images/meesho.png"
-              alt="Meesho"
-              className="max-w-[125px] max-h-[125px] object-contain"
-            />
-
-          </div>
-
-          <div>
-
-            <h3 className="text-3xl xl:text-4xl font-bold leading-tight text-white">
-              Meesho Branded
-              <br />
-              Products
-            </h3>
-
-            <a
-              href="/meesho"
-              className="mt-6 inline-flex items-center justify-center rounded-lg bg-[#d99a00] px-8 py-4 text-lg font-bold text-white transition hover:bg-[#c58900]"
+      <motion.div
+        variants={container}
+        initial={reduce ? false : "hidden"}
+        whileInView="show"
+        viewport={{ once: true, margin: "-80px" }}
+        className="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-3"
+      >
+        {brands.map((brand) => (
+          <motion.div
+            key={brand.title}
+            variants={item}
+            whileHover={reduce ? undefined : { y: -8 }}
+            transition={{ type: "spring", stiffness: 300, damping: 22 }}
+            className="h-full"
+          >
+            <Link
+              href={brand.href}
+              style={{ "--glow": brand.glow } as React.CSSProperties}
+              className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#0E1B4D]/10 bg-white p-6 shadow-[0_10px_40px_-20px_rgba(14,27,77,0.25)] transition-all duration-300 hover:border-[#3D3FA1]/30 hover:shadow-[0_30px_60px_-25px_rgba(14,27,77,0.35)]"
             >
-              Shop Now
-            </a>
+              {/* Brand-tinted hover glow */}
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,var(--glow),transparent_65%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-          </div>
+              {/* Label */}
+              <div className="relative flex items-center gap-2">
+                <span
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ backgroundColor: brand.dot }}
+                />
+                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#97A0AC]">
+                  {brand.label}
+                </span>
+              </div>
 
-        </motion.div>
+              {/* Logo / image tile */}
+              <div className="relative mt-5 flex h-48 items-center justify-center rounded-2xl bg-[#F7F8FA]">
+                <img
+                  src={brand.image}
+                  alt={brand.title}
+                  className={`${brand.imageClass} object-contain transition-transform duration-500 ease-out group-hover:-rotate-2 group-hover:scale-110`}
+                />
+              </div>
 
+              {/* Text */}
+              <div className="relative mt-6 flex flex-1 flex-col">
+                <h3 className="text-2xl font-bold leading-tight text-[#0E1B4D]">
+                  {brand.title}
+                </h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-[#6B7280]">
+                  {brand.description}
+                </p>
 
-        {/* ================= VALMO ================= */}
-
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 30,
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-          }}
-          viewport={{
-            once: true,
-          }}
-          transition={{
-            duration: 0.5,
-            delay: 0.1,
-          }}
-          className="min-h-[285px] rounded-xl bg-[#145789] px-8 xl:px-10 py-8 flex items-center gap-7 xl:gap-9"
-        >
-
-          <div className="w-[150px] h-[150px] xl:w-[170px] xl:h-[170px] shrink-0 rounded-[25px] bg-white flex items-center justify-center overflow-hidden">
-
-            <img
-              src="/images/valmo.png"
-              alt="Valmo"
-              className="max-w-[130px] max-h-[100px] object-contain"
-            />
-
-          </div>
-
-          <div>
-
-            <h3 className="text-3xl xl:text-4xl font-bold leading-tight text-white">
-              Valmo Branded
-              <br />
-              Products
-            </h3>
-
-            <a
-              href="/valmo"
-              className="mt-6 inline-flex items-center justify-center rounded-lg bg-[#d99a00] px-8 py-4 text-lg font-bold text-white transition hover:bg-[#c58900]"
-            >
-              Shop Now
-            </a>
-
-          </div>
-
-        </motion.div>
-
-
-        {/* ================= PLAIN POLY COURIER BAGS ================= */}
-
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 30,
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-          }}
-          viewport={{
-            once: true,
-          }}
-          transition={{
-            duration: 0.5,
-            delay: 0.2,
-          }}
-          className="min-h-[285px] rounded-xl bg-[#d49a1b] px-8 xl:px-10 py-8 flex items-center gap-7 xl:gap-9"
-        >
-
-          <div className="w-[150px] h-[150px] xl:w-[170px] xl:h-[170px] shrink-0 rounded-[25px] bg-white flex items-center justify-center overflow-hidden">
-
-            <img
-              src="/images/poly-courier-bag.png"
-              alt="Plain Poly Courier Bags"
-              className="max-w-[145px] max-h-[145px] object-contain"
-            />
-
-          </div>
-
-          <div>
-
-            <h3 className="text-3xl xl:text-4xl font-bold leading-tight text-white">
-              Plain Poly
-              <br />
-              Courier Bags
-            </h3>
-
-            <a
-              href="/valmo"
-              className="mt-6 inline-flex items-center justify-center rounded-lg bg-white px-8 py-4 text-lg font-bold text-[#222222] transition hover:bg-gray-100"
-            >
-              Shop Now
-            </a>
-
-          </div>
-
-        </motion.div>
-
-      </div>
-
+                <span className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-[#0E1B4D] px-6 py-3 text-sm font-semibold text-white transition-colors duration-300 group-hover:bg-[#3D3FA1]">
+                  Shop Now
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+              </div>
+            </Link>
+          </motion.div>
+        ))}
+      </motion.div>
     </section>
   );
 }

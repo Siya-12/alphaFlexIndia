@@ -32,16 +32,11 @@ export default function ProductsSection() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center"
         >
-          <h2
-            className="
-            text-4xl
-            md:text-5xl
-            font-bold
-            text-ink
-            "
-          >
-            Our Packaging Solutions
-          </h2>
+          <h2 className="mt-5 text-4xl font-bold tracking-tight text-[#0E1B4D] sm:text-5xl">
+          Our{" "}
+          <span className="font-serif italic text-[#3D3FA1]">Packaging </span>
+          <span className="mt-5 text-4xl font-bold tracking-tight text-[#0E1B4D] sm:text-5xl">Solutions</span>
+        </h2>
 
           <p
             className="

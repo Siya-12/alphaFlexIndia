@@ -133,7 +133,10 @@ export default function NoticeBoard({ logoSrc = '/images/Alpha.png' }: NoticeBoa
 
       <div className="board-wrap">
         <div className="board-header">
-          <h2 className="board-title">Everything you need to reach us</h2>
+           <h2 className="mt-5 text-4xl font-bold tracking-tight text-[#0E1B4D] sm:text-5xl">
+          Get in{" "}
+          <span className="font-serif italic text-[#3D3FA1]">Touch</span>
+        </h2>
         </div>
 
         <div className="board-cards">

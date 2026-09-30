@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import { Fragment, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -80,7 +80,7 @@ const PACKS: Pack[] = [
   {
     id: "combo-1",
     group: "combo",
-    label: "Valmo Branded Combo 1",
+    label: "Poly Branded Combo 1",
     includes: '10×14 (500 pcs), 16×18 (200 pcs) & 4×6" (2 Roll)',
     price: 273.99,
     combo: 1,
@@ -111,9 +111,6 @@ const PACKS: Pack[] = [
 
 const GROUP_ORDER: GroupKey[] = ["combo", "small", "large"];
 
-// Order used in the price table at the bottom of the page
-const PRICE_TABLE_ORDER: GroupKey[] = ["small", "large", "combo"];
-
 /* =====================================================
    HELPERS
 ===================================================== */
@@ -141,11 +138,10 @@ function findVariant(variants: ProductVariant[], pack: Pack) {
     if (isCombo || !pack.size || !text.includes(pack.size)) {
       return false;
     }
+const rest = text.split(pack.size).join(" ");
+const numbers: string[] = rest.match(/\d+/g) ?? [];
 
-    const rest = text.split(pack.size).join(" ");
-    const numbers: string[] = rest.match(/\d+/g) ?? [];
-
-    return numbers.includes(String(pack.pieces));
+return numbers.includes(String(pack.pieces));
   });
 }
 
@@ -425,7 +421,7 @@ export default function ValmoProductPage() {
           <div className="bg-white">
 
             <h1 className="text-3xl lg:text-4xl font-semibold text-[#111] leading-tight">
-              Valmo Branded Courier Bags
+              Poly Branded Courier Bags
             </h1>
 
             {/* ================= TYPE ================= */}
@@ -662,160 +658,98 @@ export default function ValmoProductPage() {
         </div>
       </section>
 
-      {/* ================= SIZE / PRICE TABLE ================= */}
+      {/* ================= VALMO PRICE LIST ================= */}
 
-      <section className="max-w-6xl mx-auto px-6 pb-16">
-
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-
-          {/* TABLE TITLE */}
-
-          <div className="bg-[#12355B] px-6 py-5">
-
-            <h2 className="text-2xl font-bold text-white">
-              Size & Pricing
-            </h2>
-
-            <p className="mt-1 text-sm text-gray-200">
-              Price, GST (18%) and total price per pack according to size
-            </p>
-
-          </div>
-
-          {/* TABLE */}
-
-          <div className="overflow-x-auto">
-
-            <table className="w-full min-w-[680px] border-collapse">
-
-              {/* HEADER */}
-
-              <thead>
-                <tr className="bg-[#EAF1F8] border-b-2 border-[#12355B]">
-
-                  <th className="px-6 py-4 text-left text-sm font-bold text-[#12355B] whitespace-nowrap">
-                    S. No.
-                  </th>
-
-                  <th className="px-6 py-4 text-left text-sm font-bold text-[#12355B] whitespace-nowrap">
-                    Pack
-                  </th>
-
-                  <th className="px-6 py-4 text-left text-sm font-bold text-[#12355B] whitespace-nowrap">
-                    Quantity
-                  </th>
-
-                  <th className="px-6 py-4 text-right text-sm font-bold text-[#12355B] whitespace-nowrap">
-                    Price (₹)
-                  </th>
-
-                  <th className="px-6 py-4 text-right text-sm font-bold text-[#12355B] whitespace-nowrap">
-                    GST (₹)
-                  </th>
-
-                  <th className="px-6 py-4 text-right text-sm font-bold text-[#12355B] whitespace-nowrap">
-                    Total (₹)
-                  </th>
-
-                </tr>
-              </thead>
-
-              {/* BODY */}
-
-              <tbody>
-
-                {PRICE_TABLE_ORDER.map((key) => (
-
-                  <Fragment key={key}>
-
-                    {/* GROUP HEADING ROW */}
-
-                    <tr className="bg-[#F1F5F9] border-b border-gray-200">
-                      <td
-                        colSpan={6}
-                        className="px-6 py-3 text-left text-sm font-bold text-[#12355B]"
-                      >
-                        {GROUPS[key].label}
-                      </td>
-                    </tr>
-
-                    {PACKS.filter((pack) => pack.group === key).map(
-                      (pack, index) => {
-                        const packGst = pack.price * GST_RATE;
-                        const packTotal = pack.price + packGst;
-
-                        return (
-                          <tr
-                            key={pack.id}
-                            className={`
-                              border-b border-gray-200
-                              transition-colors duration-200
-                              hover:bg-blue-50
-                              ${index % 2 === 0 ? "bg-white" : "bg-[#F8FAFC]"}
-                            `}
-                          >
-
-                            {/* S. NO. */}
-
-                            <td className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                              {index + 1}
-                            </td>
-
-                            {/* PACK */}
-
-                            <td className="px-6 py-4 text-left text-sm font-semibold text-[#111827] whitespace-nowrap">
-                              {pack.label}
-                            </td>
-
-                            {/* QUANTITY */}
-
-                            <td className="px-6 py-4 text-left text-sm text-gray-700">
-                              {pack.includes}
-                            </td>
-
-                            {/* PRICE */}
-
-                            <td className="px-6 py-4 text-right text-sm text-gray-800 whitespace-nowrap">
-                              {formatPrice(pack.price)}
-                            </td>
-
-                            {/* GST */}
-
-                            <td className="px-6 py-4 text-right text-sm text-gray-800 whitespace-nowrap">
-                              {formatPrice(packGst)}
-                            </td>
-
-                            {/* TOTAL */}
-
-                            <td className="px-6 py-4 text-right text-sm font-bold text-[#15803D] whitespace-nowrap">
-                              {formatPrice(packTotal)}
-                            </td>
-
-                          </tr>
-                        );
-                      }
-                    )}
-
-                  </Fragment>
-
-                ))}
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-          {/* NOTE */}
-
-          <div className="border-t border-gray-200 bg-[#F8FAFC] px-6 py-4">
-            <p className="text-sm text-gray-600">
-              Note: All prices above are reduced by ₹0.01 from the displayed prices. Extra 18% GST is applicable.
-            </p>
-          </div>
-
+      <section className="max-w-5xl mx-auto px-6 pb-16">
+        <div className="mb-8">
+          <h2 className="text-2xl lg:text-3xl font-semibold italic text-[#111]">
+            VALMO PRICE LIST
+          </h2>
+          <p className="mt-2 text-lg italic text-[#333]">
+            Extra 18% GST Applicable
+          </p>
         </div>
 
+        {/* Small Size */}
+        <div className="mb-10">
+          <h3 className="text-lg lg:text-xl italic text-[#111] mb-4">
+            1. Small Size (10 × 14 inch)
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm lg:text-base">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="py-3 px-4 text-center font-semibold">Pack Quantity</th>
+                  <th className="py-3 px-4 text-right font-semibold">Price (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PACKS.filter((pack) => pack.group === "small").map((pack) => (
+                  <tr key={pack.id} className="border-b border-gray-200">
+                    <td className="py-3 px-4 text-center">{pack.includes}</td>
+                    <td className="py-3 px-4 text-right">{pack.price.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Large Size */}
+        <div className="mb-10">
+          <h3 className="text-lg lg:text-xl italic text-[#111] mb-4">
+            2. Large Size (16 × 18 inch)
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm lg:text-base">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="py-3 px-4 text-center font-semibold">Pack Quantity</th>
+                  <th className="py-3 px-4 text-right font-semibold">Price (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PACKS.filter((pack) => pack.group === "large").map((pack) => (
+                  <tr key={pack.id} className="border-b border-gray-200">
+                    <td className="py-3 px-4 text-center">{pack.includes}</td>
+                    <td className="py-3 px-4 text-right">{pack.price.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Combos */}
+        <div>
+          <h3 className="text-lg lg:text-xl italic text-[#111] mb-4">
+            3. Valmo Branded Combos
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm lg:text-base">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="py-3 px-4 text-left font-semibold">Combo</th>
+                  <th className="py-3 px-4 text-left font-semibold">Quantity</th>
+                  <th className="py-3 px-4 text-right font-semibold">Price (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PACKS.filter((pack) => pack.group === "combo").map((pack) => (
+                  <tr key={pack.id} className="border-b border-gray-200">
+                    <td className="py-3 px-4">{pack.combo === 1 ? "Combo 1" : "Combo 2"}</td>
+                    <td className="py-3 px-4">{pack.includes}</td>
+                    <td className="py-3 px-4 text-right">{pack.price.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p className="mt-6 text-sm lg:text-base italic text-[#333]">
+          Note: All prices above are reduced by ₹0.01 from the displayed prices. Extra 18% GST is applicable.
+        </p>
       </section>
 
     </main>

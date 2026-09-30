@@ -57,7 +57,7 @@ export default function OurMachines() {
        <div className="relative mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-             <em className="not-italic text-[#051c4d]">Our Machines</em>{" "}
+             <em className="not-italic text-[#051c4d]">Our Machinaries</em>{" "}
             
           </h2>
           <p className="mt-4 text-base leading-relaxed text-[#25282b] sm:text-lg">
